@@ -1,0 +1,53 @@
+---
+description: Regras de validacao antes de commit e push para garantir deploy bem sucedido na Vercel
+globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+---
+
+# Pre-Commit Validation Rules
+
+## Antes de cada commit, verificar:
+
+### 1. TypeScript sem erros
+```bash
+npm run lint
+npx tsc --noEmit
+```
+
+### 2. Build passa sem erros
+```bash
+npm run build
+```
+
+### 3. Nenhum secret exposto
+- NUNCA commitar arquivos `.env.local` ou `.env.production`
+- Verificar se nao ha chaves de API hardcoded no codigo
+- Usar apenas `process.env.NEXT_PUBLIC_*` para variaveis publicas
+
+### 4. Imports corretos
+- Usar alias `@/*` para imports internos
+- Evitar imports relativos profundos como `../../../`
+
+## Checklist antes do push:
+
+- [ ] `npm run lint` passa sem erros
+- [ ] `npm run build` completa com sucesso
+- [ ] Nenhum `console.log` em codigo de producao
+- [ ] Arquivos `.env*` estao no `.gitignore`
+- [ ] Types do Supabase atualizados apos mudancas no schema
+
+## Comandos uteis:
+
+```bash
+# Verificar tudo antes do commit
+npm run lint && npm run build
+
+# Gerar types do Supabase
+npx supabase gen types typescript --project-id ftctmseyrqhckutpfdeq > src/types/database.ts
+```
+
+## Padroes de codigo:
+
+- Usar `"use client"` apenas em componentes que precisam de interatividade
+- Server Components por padrao
+- Evitar `any` - usar tipos corretos
+- Documentar funcoes complexas com JSDoc
