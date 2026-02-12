@@ -120,7 +120,7 @@ export default async function ManageCoursesPage() {
                           {course.title}
                         </h3>
                         <p className="text-sm text-slate-500 line-clamp-2 mt-1">
-                          {course.description || "Sem descricao"}
+                          {course.description || "Sem descrição"}
                         </p>
                       </div>
                       <span

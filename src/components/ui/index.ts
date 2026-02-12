@@ -9,3 +9,5 @@ export {
 } from "./card";
 export { Input, type InputProps } from "./input";
 export { Label } from "./label";
+export { PageHeader } from "./page-header";
+export { EmptyState } from "./empty-state";

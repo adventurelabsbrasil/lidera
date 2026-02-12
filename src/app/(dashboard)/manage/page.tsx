@@ -1,13 +1,13 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from "@/components/ui";
 import { BookOpen, GraduationCap, Users } from "lucide-react";
 import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Gerenciar",
-  description: "Painel de gestao",
+  description: "Painel de gestão",
 };
 
 export default async function ManagePage() {
@@ -47,12 +47,10 @@ export default async function ManagePage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          Painel de Gestao
-        </h1>
-        <p className="text-slate-500">Gerencie seus cursos e alunos</p>
-      </div>
+      <PageHeader
+        title="Painel de Gestão"
+        description="Gerencie seus cursos e alunos"
+      />
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-3">
@@ -83,7 +81,7 @@ export default async function ManagePage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">
-              Matriculas Ativas
+              Matrículas Ativas
             </CardTitle>
             <BookOpen className="h-4 w-4 text-purple-600" />
           </CardHeader>

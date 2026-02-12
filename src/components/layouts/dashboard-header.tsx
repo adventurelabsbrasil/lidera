@@ -3,6 +3,7 @@
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { DashboardNav } from "./dashboard-nav";
+import { ViewSwitcher } from "./view-switcher";
 import type { UserRole } from "@/types/database";
 
 interface DashboardHeaderProps {
@@ -56,7 +57,12 @@ export function DashboardHeader({ userRole, userName, orgName }: DashboardHeader
                 )}
               </div>
             )}
-            <DashboardNav userRole={userRole} />
+            {userRole === "admin" && (
+              <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-700">
+                <ViewSwitcher />
+              </div>
+            )}
+            <DashboardNav />
           </div>
         </div>
       )}

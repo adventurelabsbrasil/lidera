@@ -59,7 +59,7 @@ export function LoginForm() {
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
         <CardDescription>
-          Entre com sua conta para acessar o conteudo
+          Entre com sua conta para acessar o conteúdo
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -99,7 +99,7 @@ export function LoginForm() {
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-slate-500 dark:bg-slate-900">
+            <span className="bg-background px-2 text-slate-500">
               ou continue com email
             </span>
           </div>

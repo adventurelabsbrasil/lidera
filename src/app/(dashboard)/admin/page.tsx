@@ -53,7 +53,7 @@ export default async function AdminPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">
-              Organizacoes
+              Organizações
             </CardTitle>
             <Building2 className="h-4 w-4 text-blue-600" />
           </CardHeader>
@@ -94,10 +94,10 @@ export default async function AdminPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-5 w-5 text-blue-600" />
-                Organizacoes
+                Organizações
               </CardTitle>
               <CardDescription>
-                Gerenciar tenants e organizacoes parceiras
+                Gerenciar tenants e organizações parceiras
               </CardDescription>
             </CardHeader>
           </Card>

@@ -77,6 +77,9 @@ npm run dev
    - `supabase/migrations/20260211000002_rls_policies.sql`
 4. Execute o arquivo de seed:
    - `supabase/seed.sql`
+5. (Opcional) Execute dados de exemplo adicionais e matriculas:
+   - `supabase/seed-extended.sql`
+   - Edite o `user_id` nas enrollments se necessário
 
 ### Configurar Autenticacao
 
@@ -85,9 +88,18 @@ npm run dev
    - Adicione Client ID e Secret do Google Cloud Console
    - Configure a URL de callback: `https://ftctmseyrqhckutpfdeq.supabase.co/auth/v1/callback`
 
+### View Switcher (Admin)
+
+Usuarios com role `admin` veem um dropdown "Ver como..." no sidebar para alternar a visualizacao:
+- **Ver como Admin**: Navegacao completa (Learn + Manage + Admin)
+- **Ver como Tenant**: Learn + Manage
+- **Ver como Estudante**: Apenas Learn
+
+A preferencia e salva em localStorage.
+
 ### Configurar Usuarios Iniciais
 
-Apos os usuarios se cadastrarem via Google ou Email, execute no SQL Editor:
+Apos os usuarios se cadastrarem via Google ou Email, execute no SQL Editor ou use `supabase/setup-admin.sql`:
 
 ```sql
 -- Configurar admin

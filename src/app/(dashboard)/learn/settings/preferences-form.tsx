@@ -34,9 +34,9 @@ export function PreferencesForm({ userId, initialData }: PreferencesFormProps) {
       .eq("id", userId);
 
     if (error) {
-      setMessage({ type: "error", text: "Erro ao salvar preferencias" });
+      setMessage({ type: "error", text: "Erro ao salvar preferências" });
     } else {
-      setMessage({ type: "success", text: "Preferencias salvas com sucesso!" });
+      setMessage({ type: "success", text: "Preferências salvas com sucesso!" });
     }
 
     setLoading(false);
@@ -76,14 +76,14 @@ export function PreferencesForm({ userId, initialData }: PreferencesFormProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Preferencias de Aprendizado</CardTitle>
+          <CardTitle>Preferências de Aprendizado</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Notificacoes por Email</p>
               <p className="text-sm text-slate-500">
-                Receba atualizacoes sobre novos conteudos
+                Receba atualizações sobre novos conteúdos
               </p>
             </div>
             <input
@@ -124,7 +124,7 @@ export function PreferencesForm({ userId, initialData }: PreferencesFormProps) {
         ) : (
           <Save className="mr-2 h-4 w-4" />
         )}
-        Salvar Preferencias
+        Salvar Preferências
       </Button>
     </form>
   );

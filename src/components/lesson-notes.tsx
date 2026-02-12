@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { Loader2, PenLine, Save } from "lucide-react";
+
+const AUTOSAVE_DELAY_MS = 2000;
 
 interface LessonNotesProps {
   lessonId: string;
@@ -18,10 +20,11 @@ export function LessonNotes({ lessonId, userId, initialContent }: LessonNotesPro
   const [lastSaved, setLastSaved] = useState<Date | null>(
     initialContent ? new Date() : null
   );
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const saveNote = useCallback(async () => {
     if (!content.trim()) return;
-    
+
     setSaving(true);
     const supabase = createClient();
 
@@ -43,13 +46,35 @@ export function LessonNotes({ lessonId, userId, initialContent }: LessonNotesPro
     setSaving(false);
   }, [content, lessonId, userId]);
 
+  // Auto-save with debounce (2s after user stops typing)
+  useEffect(() => {
+    if (content === initialContent) return;
+
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = setTimeout(() => {
+      debounceRef.current = null;
+      if (content.trim()) {
+        saveNote();
+      }
+    }, AUTOSAVE_DELAY_MS);
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, [content, saveNote, initialContent]);
+
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <PenLine className="h-5 w-5" />
-            Minhas Anotacoes
+            Minhas Anotações
           </CardTitle>
           {lastSaved && (
             <span className="text-xs text-slate-500">
@@ -62,7 +87,7 @@ export function LessonNotes({ lessonId, userId, initialContent }: LessonNotesPro
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Escreva suas anotacoes sobre esta aula..."
+          placeholder="Escreva suas anotações sobre esta aula..."
           className="w-full min-h-[200px] p-4 rounded-lg border border-slate-200 bg-white resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800"
         />
         <div className="flex justify-end">
@@ -72,7 +97,7 @@ export function LessonNotes({ lessonId, userId, initialContent }: LessonNotesPro
             ) : (
               <Save className="mr-2 h-4 w-4" />
             )}
-            Salvar Anotacoes
+            Salvar Anotações
           </Button>
         </div>
       </CardContent>

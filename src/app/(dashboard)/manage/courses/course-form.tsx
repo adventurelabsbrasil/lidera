@@ -86,12 +86,12 @@ export function CourseForm({ orgId, course }: CourseFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descricao</Label>
+            <Label htmlFor="description">Descrição</Label>
             <textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descreva o conteudo do curso..."
+              placeholder="Descreva o conteúdo do curso..."
               className="w-full min-h-[100px] p-3 rounded-md border border-slate-300 bg-transparent resize-y focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-700"
             />
           </div>

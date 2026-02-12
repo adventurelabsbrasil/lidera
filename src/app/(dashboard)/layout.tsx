@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardHeader, DashboardSidebar } from "@/components/layouts";
+import { ViewSwitcherProvider } from "@/lib/context/view-switcher-context";
 import type { UserRole } from "@/types/database";
 
 export default async function DashboardLayout({
@@ -30,20 +31,22 @@ export default async function DashboardLayout({
   const orgName = (profile?.organizations as { name: string } | null)?.name;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      <DashboardSidebar
-        userRole={userRole}
-        userName={userName}
-        orgName={orgName}
-      />
-      <DashboardHeader
-        userRole={userRole}
-        userName={userName}
-        orgName={orgName}
-      />
-      <main className="lg:pl-64">
-        <div className="p-4 lg:p-8">{children}</div>
-      </main>
-    </div>
+    <ViewSwitcherProvider userRole={userRole}>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+        <DashboardSidebar
+          userRole={userRole}
+          userName={userName}
+          orgName={orgName}
+        />
+        <DashboardHeader
+          userRole={userRole}
+          userName={userName}
+          orgName={orgName}
+        />
+        <main className="lg:pl-64">
+          <div className="p-4 lg:p-8">{children}</div>
+        </main>
+      </div>
+    </ViewSwitcherProvider>
   );
 }

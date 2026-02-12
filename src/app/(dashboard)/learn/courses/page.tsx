@@ -1,10 +1,11 @@
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
-import { BookOpen } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader, EmptyState } from "@/components/ui";
+import { BookOpen, PlayCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { getYouTubeThumbnail } from "@/lib/utils";
+import { getAuthUser } from "@/lib/supabase/auth-helpers";
 
 export const metadata: Metadata = {
   title: "Meus Cursos",
@@ -13,9 +14,8 @@ export const metadata: Metadata = {
 
 export default async function CoursesPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser(supabase);
+  if (!user) redirect("/auth/login");
 
   // Get enrolled courses with details
   const { data: enrollments } = await supabase
@@ -33,14 +33,14 @@ export default async function CoursesPage() {
         )
       )
     `)
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .eq("status", "active");
 
   // Get user's lesson progress
   const { data: progress } = await supabase
     .from("lesson_progress")
     .select("lesson_id, completed")
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .eq("completed", true);
 
   const completedLessonIds = new Set(progress?.map((p: { lesson_id: string }) => p.lesson_id) || []);
@@ -77,38 +77,22 @@ export default async function CoursesPage() {
   if (!coursesWithProgress?.length) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Meus Cursos
-          </h1>
-          <p className="text-slate-500">Seus cursos matriculados</p>
-        </div>
-
-        <Card className="text-center py-12">
-          <CardContent>
-            <BookOpen className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-              Nenhum curso encontrado
-            </h3>
-            <p className="text-slate-500 mt-2">
-              Voce ainda nao esta matriculado em nenhum curso.
-            </p>
-          </CardContent>
-        </Card>
+        <PageHeader title="Meus Cursos" description="Seus cursos matriculados" />
+        <EmptyState
+          icon={BookOpen}
+          title="Nenhum curso encontrado"
+          description="Você ainda não está matriculado em nenhum curso. Entre em contato com seu administrador para obter acesso."
+        />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          Meus Cursos
-        </h1>
-        <p className="text-slate-500">
-          {coursesWithProgress.length} curso(s) ativo(s)
-        </p>
-      </div>
+      <PageHeader
+        title="Meus Cursos"
+        description={`${coursesWithProgress.length} curso(s) ativo(s)`}
+      />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {coursesWithProgress.map((course) => (
@@ -131,13 +115,25 @@ export default async function CoursesPage() {
               <CardHeader>
                 <CardTitle className="line-clamp-1">{course!.title}</CardTitle>
                 <CardDescription className="line-clamp-2">
-                  {course!.description || "Sem descricao"}
+                  {course!.description || "Sem descrição"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between items-center text-sm">
                     <span className="text-slate-500">Progresso</span>
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                        course!.progressPercent > 0
+                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+                          : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                      }`}
+                    >
+                      <PlayCircle className="h-3 w-3" />
+                      {course!.progressPercent > 0 ? "Continuar" : "Começar"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm">
                     <span className="font-medium">
                       {course!.completedLessons}/{course!.totalLessons} aulas
                     </span>

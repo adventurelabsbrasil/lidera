@@ -46,3 +46,13 @@ export function calculateProgress(completed: number, total: number): number {
   if (total === 0) return 0;
   return Math.round((completed / total) * 100);
 }
+
+export function formatStudyTime(seconds: number): string {
+  if (!seconds || seconds < 60) return "0min";
+  const hours = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  if (hours > 0) {
+    return mins > 0 ? `${hours}h ${mins}min` : `${hours}h`;
+  }
+  return `${mins}min`;
+}

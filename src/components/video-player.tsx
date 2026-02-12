@@ -73,7 +73,7 @@ export function VideoPlayer({
           {isCompleted ? (
             <span className="flex items-center gap-2 text-green-600 font-medium">
               <CheckCircle className="h-5 w-5" />
-              Aula concluida
+              Aula concluída
             </span>
           ) : (
             <Button onClick={markAsCompleted} disabled={marking}>
@@ -82,7 +82,7 @@ export function VideoPlayer({
               ) : (
                 <>
                   <CheckCircle className="mr-2 h-4 w-4" />
-                  Marcar como concluida
+                  Marcar como concluída
                 </>
               )}
             </Button>

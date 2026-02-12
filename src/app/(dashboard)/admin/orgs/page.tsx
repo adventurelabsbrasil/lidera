@@ -1,14 +1,14 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Card, CardContent } from "@/components/ui";
+import { Card, CardContent, PageHeader, EmptyState } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { Building2, Plus } from "lucide-react";
 import { AddOrgDialog } from "./add-org-dialog";
 
 export const metadata: Metadata = {
-  title: "Organizacoes",
-  description: "Gerenciar organizacoes",
+  title: "Organizações",
+  description: "Gerenciar organizações",
 };
 
 export default async function AdminOrgsPage() {
@@ -40,29 +40,19 @@ export default async function AdminOrgsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Organizacoes
-          </h1>
-          <p className="text-slate-500">
-            {organizations?.length || 0} organizacao(oes) cadastrada(s)
-          </p>
-        </div>
+        <PageHeader
+          title="Organizações"
+          description={`${organizations?.length || 0} organização(ões) cadastrada(s)`}
+        />
         <AddOrgDialog />
       </div>
 
       {!organizations?.length ? (
-        <Card className="text-center py-12">
-          <CardContent>
-            <Building2 className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-              Nenhuma organizacao cadastrada
-            </h3>
-            <p className="text-slate-500 mt-2">
-              Crie sua primeira organizacao
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={Building2}
+          title="Nenhuma organização cadastrada"
+          description="Crie sua primeira organização para começar a gerenciar cursos e alunos. Use o botão acima."
+        />
       ) : (
         <div className="grid gap-4">
           {organizations.map((org) => (

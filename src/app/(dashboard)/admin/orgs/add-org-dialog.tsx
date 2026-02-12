@@ -46,7 +46,7 @@ export function AddOrgDialog() {
     return (
       <Button onClick={() => setOpen(true)}>
         <Plus className="mr-2 h-4 w-4" />
-        Nova Organizacao
+        Nova Organização
       </Button>
     );
   }
@@ -65,7 +65,7 @@ export function AddOrgDialog() {
           <X className="h-5 w-5" />
         </button>
 
-        <h2 className="text-xl font-semibold mb-4">Nova Organizacao</h2>
+        <h2 className="text-xl font-semibold mb-4">Nova Organização</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">

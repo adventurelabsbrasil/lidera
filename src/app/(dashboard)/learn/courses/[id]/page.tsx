@@ -126,7 +126,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4" />
-            <span>{completedCount} concluidas</span>
+            <span>{completedCount} concluídas</span>
           </div>
         </div>
       </div>

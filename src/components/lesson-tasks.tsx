@@ -71,7 +71,7 @@ export function LessonTasks({
             Tarefas da Aula
           </CardTitle>
           <span className="text-sm text-slate-500">
-            {completedCount}/{tasks.length} concluidas
+            {completedCount}/{tasks.length} concluídas
           </span>
         </div>
       </CardHeader>

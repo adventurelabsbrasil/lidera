@@ -158,7 +158,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              Conteudo da Aula
+              Conteúdo da Aula
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -191,32 +191,34 @@ export default async function LessonPage({ params }: LessonPageProps) {
         initialContent={note?.content || ""}
       />
 
-      {/* Navigation */}
-      <div className="flex items-center justify-between pt-6 border-t">
-        {prevLesson ? (
-          <Link
-            href={`/learn/lessons/${prevLesson.id}`}
-            className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">{prevLesson.title}</span>
-            <span className="sm:hidden">Anterior</span>
-          </Link>
-        ) : (
-          <div />
-        )}
-        {nextLesson ? (
-          <Link
-            href={`/learn/lessons/${nextLesson.id}`}
-            className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
-          >
-            <span className="hidden sm:inline">{nextLesson.title}</span>
-            <span className="sm:hidden">Proxima</span>
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        ) : (
-          <div />
-        )}
+      {/* Navigation - sticky at bottom when scrolling */}
+      <div className="sticky bottom-0 z-10 -mx-4 -mb-4 px-4 pb-4 pt-4 mt-8 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 lg:-mx-8 lg:px-8 lg:pb-8 lg:mb-8">
+        <div className="flex items-center justify-between">
+          {prevLesson ? (
+            <Link
+              href={`/learn/lessons/${prevLesson.id}`}
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline truncate max-w-[200px]">{prevLesson.title}</span>
+              <span className="sm:hidden">Anterior</span>
+            </Link>
+          ) : (
+            <div />
+          )}
+          {nextLesson ? (
+            <Link
+              href={`/learn/lessons/${nextLesson.id}`}
+              className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors ml-auto"
+            >
+              <span className="hidden sm:inline truncate max-w-[200px]">{nextLesson.title}</span>
+              <span className="sm:hidden">Próxima</span>
+              <ArrowRight className="h-4 w-4 flex-shrink-0" />
+            </Link>
+          ) : (
+            <div />
+          )}
+        </div>
       </div>
     </div>
   );

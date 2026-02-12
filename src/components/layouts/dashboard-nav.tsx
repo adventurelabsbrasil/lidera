@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { useViewSwitcher } from "@/lib/context/view-switcher-context";
 import type { UserRole } from "@/types/database";
 
 interface NavItem {
@@ -27,7 +28,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   // Student navigation
   {
-    title: "Inicio",
+    title: "Início",
     href: "/learn",
     icon: Home,
     roles: ["student", "tenant", "admin"],
@@ -39,7 +40,7 @@ const navItems: NavItem[] = [
     roles: ["student", "tenant", "admin"],
   },
   {
-    title: "Preferencias",
+    title: "Preferências",
     href: "/learn/settings",
     icon: Settings,
     roles: ["student", "tenant", "admin"],
@@ -71,7 +72,7 @@ const navItems: NavItem[] = [
     roles: ["admin"],
   },
   {
-    title: "Organizacoes",
+    title: "Organizações",
     href: "/admin/orgs",
     icon: Building2,
     roles: ["admin"],
@@ -84,15 +85,12 @@ const navItems: NavItem[] = [
   },
 ];
 
-interface DashboardNavProps {
-  userRole: UserRole;
-}
-
-export function DashboardNav({ userRole }: DashboardNavProps) {
+export function DashboardNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const { viewAsRole } = useViewSwitcher();
   const filteredItems = navItems.filter((item) =>
-    item.roles.includes(userRole)
+    item.roles.includes(viewAsRole)
   );
 
   async function handleLogout() {
@@ -125,7 +123,7 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
               <NavLink
                 key={item.href}
                 item={item}
-                isActive={pathname === item.href}
+                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
               />
             ))}
           </div>
@@ -134,13 +132,13 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
         {tenantItems.length > 0 && (
           <div className="space-y-1 pt-4">
             <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Gestao
+              Gestão
             </p>
             {tenantItems.map((item) => (
               <NavLink
                 key={item.href}
                 item={item}
-                isActive={pathname === item.href}
+                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
               />
             ))}
           </div>
@@ -149,13 +147,13 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
         {adminItems.length > 0 && (
           <div className="space-y-1 pt-4">
             <p className="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-              Administracao
+              Administração
             </p>
             {adminItems.map((item) => (
               <NavLink
                 key={item.href}
                 item={item}
-                isActive={pathname === item.href}
+                isActive={pathname === item.href || pathname.startsWith(item.href + "/")}
               />
             ))}
           </div>
