@@ -77,18 +77,30 @@ npm run dev
 
 ### Configurar Supabase
 
+**Opção A – Local com Supabase CLI (recomendado para dev)**
+
+```bash
+supabase start
+supabase db reset   # aplica migrations + seed em um comando
+```
+
+O seed já inclui organizações, 4 cursos com módulos/aulas, e **usuários de teste** (senha de todos: `password123`):
+
+| Email | Senha | Papel |
+|-------|--------|--------|
+| admin@adventurelabs.com.br | password123 | Admin (criar orgs, ver tudo) |
+| lidera@adventurelabs.com.br | password123 | Tenant (criar cursos da Lidera) |
+| aluno@adventurelabs.com.br | password123 | Aluno (cursos matriculados) |
+
+**Opção B – Supabase remoto (Dashboard)**
+
 1. Acesse o [Supabase Dashboard](https://supabase.com/dashboard)
-2. Va em SQL Editor
-3. Execute os arquivos de migration em ordem:
+2. Vá em SQL Editor e execute as migrations em ordem:
    - `supabase/migrations/20260211000001_initial_schema.sql`
    - `supabase/migrations/20260211000002_rls_policies.sql`
-4. Execute a migration de convites pendentes:
    - `supabase/migrations/20260212000001_pending_invites.sql`
-5. Execute o arquivo de seed:
-   - `supabase/seed.sql`
-6. (Opcional) Execute dados de exemplo adicionais e matriculas:
-   - `supabase/seed-extended.sql`
-   - Edite o `user_id` nas enrollments se necessário
+3. Execute o seed: `supabase/seed.sql`
+4. Usuários de teste são criados pelo seed; use os logins acima (em projeto remoto você pode precisar ajustar Auth ou criar usuários manualmente e depois atualizar `profiles`).
 
 ### Configurar Autenticacao
 
@@ -108,7 +120,7 @@ A preferencia e salva em localStorage.
 
 ### Configurar Usuarios Iniciais
 
-Apos os usuarios se cadastrarem via Google ou Email, execute no SQL Editor ou use `supabase/setup-admin.sql`:
+Se você **não** usou o seed (que já cria admin/tenant/aluno), faça o primeiro cadastro em `/auth/signup` e depois no SQL Editor ou use `supabase/setup-admin.sql` (edite o email). **Ordem no app:** só admin cria organizações; para criar curso é preciso ter uma organização (tenant/admin com org_id, ou admin escolhendo a org na tela Novo curso); alunos são adicionados depois por e-mail. Não é necessário cadastrar aluno para cadastrar curso.
 
 ```sql
 -- Configurar admin
@@ -121,6 +133,8 @@ UPDATE profiles
 SET role = 'tenant', org_id = '00000000-0000-0000-0000-000000000002' 
 WHERE email IN ('lidera@adventurelabs.com.br', 'contato@somoslidera.com.br');
 ```
+
+Para **criar curso**: não é preciso cadastrar aluno antes; é preciso ter organização e ser tenant ou admin (admin sem org pode escolher a org na tela "Novo curso").
 
 ### Deploy na Vercel
 
