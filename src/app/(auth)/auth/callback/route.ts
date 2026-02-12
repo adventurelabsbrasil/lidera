@@ -8,13 +8,15 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    
-    if (!error) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (!error && data.user) {
+      await supabase.rpc("process_pending_invites", {
+        p_user_id: data.user.id,
+      });
       return NextResponse.redirect(`${origin}${redirect}`);
     }
   }
 
-  // Return the user to an error page with instructions
   return NextResponse.redirect(`${origin}/auth/login?error=auth_error`);
 }

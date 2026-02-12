@@ -19,9 +19,16 @@ Adventure Labs (Admin)
 │   └── Alunos (Students)
 ```
 
+### Cadastro e convites
+
+- Usuarios podem criar conta em `/auth/signup` (email ou Google)
+- Tenant/Admin adiciona aluno por email: se já tem conta, matricula; se não, cria convite
+- Ao se cadastrar, convites pendentes são processados automaticamente
+- Usuário vê apenas os cursos para os quais foi matriculado
+
 ### Roles
 
-- **Admin**: Acesso total a todas organizacoes (admin@adventurelabs.com.br)
+- **Admin**: Acesso total a todas organizações (admin@adventurelabs.com.br)
 - **Tenant**: Gerencia cursos e alunos da sua organizacao (lidera@adventurelabs.com.br, contato@somoslidera.com.br)
 - **Student**: Acessa cursos matriculados, faz anotacoes, completa tarefas
 
@@ -75,9 +82,11 @@ npm run dev
 3. Execute os arquivos de migration em ordem:
    - `supabase/migrations/20260211000001_initial_schema.sql`
    - `supabase/migrations/20260211000002_rls_policies.sql`
-4. Execute o arquivo de seed:
+4. Execute a migration de convites pendentes:
+   - `supabase/migrations/20260212000001_pending_invites.sql`
+5. Execute o arquivo de seed:
    - `supabase/seed.sql`
-5. (Opcional) Execute dados de exemplo adicionais e matriculas:
+6. (Opcional) Execute dados de exemplo adicionais e matriculas:
    - `supabase/seed-extended.sql`
    - Edite o `user_id` nas enrollments se necessário
 

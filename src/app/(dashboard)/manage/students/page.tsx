@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui";
 import { Button } from "@/components/ui";
-import { Plus, Users } from "lucide-react";
+import { Clock, Plus, Users } from "lucide-react";
 import { AddStudentDialog } from "./add-student-dialog";
 
 export const metadata: Metadata = {
@@ -27,22 +27,58 @@ export default async function ManageStudentsPage() {
     redirect("/learn");
   }
 
-  // Get students for this organization
-  const { data: students } = await supabase
-    .from("profiles")
-    .select(`
-      *,
-      enrollments (
-        id,
-        status,
-        courses (title)
-      )
-    `)
+  // Get students: users enrolled in our org's courses (includes org members + cross-enrolled)
+  const { data: courseIds } = await supabase
+    .from("courses")
+    .select("id")
+    .eq("org_id", profile.org_id!);
+  const ids = courseIds?.map((c) => c.id) || [];
+
+  const { data: enrollmentsData } =
+    ids.length > 0
+      ? await supabase
+          .from("enrollments")
+          .select(`
+            user_id,
+            status,
+            courses (title)
+          `)
+          .in("course_id", ids)
+          .eq("status", "active")
+      : { data: [] };
+
+  const uniqueUserIds = [
+    ...new Set((enrollmentsData || []).map((e: { user_id: string }) => e.user_id)),
+  ];
+  const { data: students } =
+    uniqueUserIds.length > 0
+      ? await supabase
+          .from("profiles")
+          .select(`
+            id,
+            full_name,
+            email,
+            created_at,
+            org_id
+          `)
+          .in("id", uniqueUserIds)
+      : { data: [] };
+
+  const enrollmentsByUser: Record<string, { status: string; courses: { title: string } | null }[]> = {};
+  for (const e of enrollmentsData || []) {
+    const row = e as { user_id: string; status: string; courses: { title: string } | { title: string }[] | null };
+    const key = row.user_id;
+    if (!enrollmentsByUser[key]) enrollmentsByUser[key] = [];
+    const courses = Array.isArray(row.courses) ? row.courses[0] : row.courses;
+    enrollmentsByUser[key].push({ status: row.status, courses: courses ?? null });
+  }
+
+  const { data: pendingInvites } = await supabase
+    .from("pending_invites")
+    .select("id, email, full_name, course_ids, created_at")
     .eq("org_id", profile.org_id!)
-    .eq("role", "student")
     .order("created_at", { ascending: false });
 
-  // Get courses for enrollment dropdown
   const { data: courses } = await supabase
     .from("courses")
     .select("id, title")
@@ -57,11 +93,45 @@ export default async function ManageStudentsPage() {
             Alunos
           </h1>
           <p className="text-slate-500">
-            {students?.length || 0} aluno(s) cadastrado(s)
+            {(students || []).length} aluno(s) matriculado(s)
           </p>
         </div>
-        <AddStudentDialog orgId={profile.org_id!} courses={courses || []} />
+        <AddStudentDialog
+          orgId={profile.org_id!}
+          courses={courses || []}
+          invitedBy={user!.id}
+        />
       </div>
+
+      {pendingInvites && pendingInvites.length > 0 && (
+        <Card>
+          <CardContent className="p-4">
+            <h3 className="font-medium flex items-center gap-2 mb-3">
+              <Clock className="h-4 w-4 text-amber-500" />
+              Convites pendentes ({pendingInvites.length})
+            </h3>
+            <p className="text-sm text-slate-500 mb-3">
+              Estas pessoas foram convidadas e verão os cursos ao se cadastrarem.
+            </p>
+            <div className="space-y-2">
+              {pendingInvites.map((inv: { id: string; email: string; full_name: string | null; created_at: string }) => (
+                <div
+                  key={inv.id}
+                  className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                >
+                  <div>
+                    <p className="font-medium">{inv.full_name || inv.email}</p>
+                    <p className="text-sm text-slate-500">{inv.email}</p>
+                  </div>
+                  <span className="text-xs text-slate-400">
+                    {new Date(inv.created_at).toLocaleDateString("pt-BR")}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {!students?.length ? (
         <Card className="text-center py-12">
@@ -77,12 +147,11 @@ export default async function ManageStudentsPage() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {students.map((student: {
+          {(students || []).map((student: {
             id: string;
             full_name: string | null;
             email: string;
             created_at: string;
-            enrollments: { id: string; status: string; courses: { title: string } | null }[] | null;
           }) => (
             <Card key={student.id}>
               <CardContent className="p-4">
@@ -92,19 +161,21 @@ export default async function ManageStudentsPage() {
                       {student.full_name || "Sem nome"}
                     </h3>
                     <p className="text-sm text-slate-500">{student.email}</p>
-                    <div className="flex gap-2 mt-2">
-                      {student.enrollments?.map((enrollment: { id: string; status: string; courses: { title: string } | null }) => (
-                        <span
-                          key={enrollment.id}
-                          className={`px-2 py-0.5 text-xs rounded-full ${
-                            enrollment.status === "active"
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400"
-                              : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
-                          }`}
-                        >
-                          {(enrollment.courses as { title: string })?.title}
-                        </span>
-                      ))}
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      {(enrollmentsByUser[student.id] || [])
+                        .filter((e) => e.courses)
+                        .map((enrollment, i) => (
+                          <span
+                            key={i}
+                            className={`px-2 py-0.5 text-xs rounded-full ${
+                              enrollment.status === "active"
+                                ? "bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-400"
+                                : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                            }`}
+                          >
+                            {(enrollment.courses as { title: string })?.title}
+                          </span>
+                        ))}
                     </div>
                   </div>
                   <span className="text-xs text-slate-500">

@@ -14,9 +14,10 @@ interface Course {
 interface AddStudentDialogProps {
   orgId: string;
   courses: Course[];
+  invitedBy?: string;
 }
 
-export function AddStudentDialog({ orgId, courses }: AddStudentDialogProps) {
+export function AddStudentDialog({ orgId, courses, invitedBy }: AddStudentDialogProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
@@ -32,19 +33,31 @@ export function AddStudentDialog({ orgId, courses }: AddStudentDialogProps) {
 
     const supabase = createClient();
 
-    // Check if user already exists
-    const { data: existingProfile } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("email", email)
-      .single();
+    if (selectedCourses.length === 0) {
+      setError("Selecione pelo menos um curso.");
+      setLoading(false);
+      return;
+    }
 
-    if (existingProfile) {
-      // User exists, just create enrollments
+    // Try to find existing user by email (RPC bypasses RLS for this lookup)
+    const { data: userId } = await supabase.rpc("find_user_id_by_email", {
+      p_email: email.trim(),
+    });
+
+    if (userId) {
+      // User exists: update profile (org_id, full_name) if allowed by RLS, create enrollments
+      await supabase
+        .from("profiles")
+        .update({
+          org_id: orgId,
+          ...(fullName.trim() && { full_name: fullName.trim() }),
+        })
+        .eq("id", userId);
+
       for (const courseId of selectedCourses) {
         await supabase.from("enrollments").upsert(
           {
-            user_id: existingProfile.id,
+            user_id: userId,
             course_id: courseId,
             status: "active",
           },
@@ -52,33 +65,21 @@ export function AddStudentDialog({ orgId, courses }: AddStudentDialogProps) {
         );
       }
     } else {
-      // Create invite - in production, you'd send an email
-      // For now, we'll create a placeholder profile
-      const { data: newProfile, error: profileError } = await supabase
-        .from("profiles")
+      // User doesn't exist: create pending invite
+      const { error: inviteError } = await supabase
+        .from("pending_invites")
         .insert({
-          id: crypto.randomUUID(),
-          email,
-          full_name: fullName,
+          email: email.trim().toLowerCase(),
           org_id: orgId,
-          role: "student" as const,
-        })
-        .select()
-        .single();
+          course_ids: selectedCourses,
+          full_name: fullName.trim() || null,
+          invited_by: invitedBy || null,
+        });
 
-      if (profileError) {
-        setError("Erro ao criar aluno. O usuario pode precisar fazer login primeiro.");
+      if (inviteError) {
+        setError(inviteError.message);
         setLoading(false);
         return;
-      }
-
-      // Create enrollments
-      for (const courseId of selectedCourses) {
-        await supabase.from("enrollments").insert({
-          user_id: newProfile.id,
-          course_id: courseId,
-          status: "active",
-        });
       }
     }
 
@@ -114,6 +115,10 @@ export function AddStudentDialog({ orgId, courses }: AddStudentDialogProps) {
         </button>
 
         <h2 className="text-xl font-semibold mb-4">Adicionar Aluno</h2>
+        <p className="text-sm text-slate-500 mb-4">
+          Se a pessoa já tem conta, será matriculada. Se não, criaremos um
+          convite e ela verá os cursos ao se cadastrar.
+        </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -129,7 +134,7 @@ export function AddStudentDialog({ orgId, courses }: AddStudentDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="fullName">Nome Completo</Label>
+            <Label htmlFor="fullName">Nome completo</Label>
             <Input
               id="fullName"
               value={fullName}
@@ -139,7 +144,7 @@ export function AddStudentDialog({ orgId, courses }: AddStudentDialogProps) {
           </div>
 
           <div className="space-y-2">
-            <Label>Matricular em:</Label>
+            <Label>Matricular em: *</Label>
             <div className="space-y-2 max-h-40 overflow-y-auto">
               {courses.map((course) => (
                 <label
@@ -169,7 +174,11 @@ export function AddStudentDialog({ orgId, courses }: AddStudentDialogProps) {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex gap-2 pt-2">
-            <Button type="submit" disabled={loading || !email} className="flex-1">
+            <Button
+              type="submit"
+              disabled={loading || !email.trim() || selectedCourses.length === 0}
+              className="flex-1"
+            >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Adicionar
             </Button>

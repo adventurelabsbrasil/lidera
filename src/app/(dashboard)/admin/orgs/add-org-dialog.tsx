@@ -88,12 +88,12 @@ export function AddOrgDialog() {
               placeholder="lidera"
             />
             <p className="text-xs text-slate-500">
-              Usado na URL. Se vazio, sera gerado automaticamente.
+              Usado na URL. Se vazio, será gerado automaticamente.
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="domain">Dominio</Label>
+            <Label htmlFor="domain">Domínio</Label>
             <Input
               id="domain"
               value={domain}

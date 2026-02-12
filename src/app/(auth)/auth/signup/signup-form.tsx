@@ -1,30 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from "@/components/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+} from "@/components/ui";
 import { Loader2 } from "lucide-react";
 
-export function LoginForm() {
+export function SignupForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/learn";
 
-  async function handleEmailLogin(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: `${window.location.origin}/auth/callback?redirect=${redirect}`,
+      },
     });
 
     if (error) {
@@ -34,16 +49,20 @@ export function LoginForm() {
     }
 
     const { data } = await supabase.auth.getSession();
+    setLoading(false);
+
     if (data.session?.user) {
       await supabase.rpc("process_pending_invites", {
         p_user_id: data.session.user.id,
       });
+      router.push(redirect);
+      router.refresh();
+    } else {
+      setSuccess(true);
     }
-    router.push(redirect);
-    router.refresh();
   }
 
-  async function handleGoogleLogin() {
+  async function handleGoogleSignup() {
     setLoading(true);
     setError(null);
 
@@ -57,23 +76,45 @@ export function LoginForm() {
 
     if (error) {
       setError(error.message);
-      setLoading(false);
     }
+    setLoading(false);
+  }
+
+  if (success) {
+    return (
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Confira seu email</CardTitle>
+          <CardDescription>
+            Enviamos um link de confirmação para {email}. Clique no link para
+            ativar sua conta e acessar os conteúdos.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="text-center space-y-4">
+          <Link
+            href="/auth/login"
+            className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+          >
+            Voltar para o login
+          </Link>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
+        <CardTitle className="text-2xl">Criar conta</CardTitle>
         <CardDescription>
-          Entre com sua conta para acessar o conteúdo
+          Cadastre-se para acessar os conteúdos disponíveis para você
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button
           variant="outline"
           className="w-full"
-          onClick={handleGoogleLogin}
+          onClick={handleGoogleSignup}
           disabled={loading}
         >
           {loading ? (
@@ -98,7 +139,7 @@ export function LoginForm() {
               />
             </svg>
           )}
-          Entrar com Google
+          Continuar com Google
         </Button>
 
         <div className="relative">
@@ -107,14 +148,24 @@ export function LoginForm() {
           </div>
           <div className="relative flex justify-center text-xs uppercase">
             <span className="bg-background px-2 text-slate-500">
-              ou continue com email
+              ou cadastre com email
             </span>
           </div>
         </div>
 
-        <form onSubmit={handleEmailLogin} className="space-y-4">
+        <form onSubmit={handleSignup} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="fullName">Nome completo</Label>
+            <Input
+              id="fullName"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Seu nome"
+              disabled={loading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email *</Label>
             <Input
               id="email"
               type="email"
@@ -126,14 +177,15 @@ export function LoginForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">Senha *</Label>
             <Input
               id="password"
               type="password"
-              placeholder="********"
+              placeholder="Mínimo 6 caracteres"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              minLength={6}
               disabled={loading}
             />
           </div>
@@ -144,19 +196,19 @@ export function LoginForm() {
 
           <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Entrar
+            Criar conta
           </Button>
-
-          <p className="text-center text-sm text-slate-500">
-            Não tem conta?{" "}
-            <Link
-              href="/auth/signup"
-              className="text-blue-600 hover:underline dark:text-blue-400"
-            >
-              Criar conta
-            </Link>
-          </p>
         </form>
+
+        <p className="text-center text-sm text-slate-500">
+          Já tem conta?{" "}
+          <Link
+            href="/auth/login"
+            className="text-blue-600 hover:underline dark:text-blue-400"
+          >
+            Entrar
+          </Link>
+        </p>
       </CardContent>
     </Card>
   );
