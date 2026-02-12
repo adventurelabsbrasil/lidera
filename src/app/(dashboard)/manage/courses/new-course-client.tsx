@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Card, CardContent, Label } from "@/components/ui";
-import { CourseForm } from "../course-form";
+import { CourseForm } from "./course-form";
 
 interface Org {
   id: string;
