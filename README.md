@@ -13,7 +13,7 @@ Plataforma de area de membros (Learning SaaS) multi-tenant desenvolvida para a L
 ```
 Adventure Labs (Admin)
 ├── Lidera Consultoria (Tenant)
-│   ├── Cursos
+│   ├── Conteúdos
 │   │   ├── Modulos
 │   │   │   └── Aulas (videos, tarefas, recursos)
 │   └── Alunos (Students)
@@ -24,28 +24,28 @@ Adventure Labs (Admin)
 - Usuarios podem criar conta em `/auth/signup` (email ou Google)
 - Tenant/Admin adiciona aluno por email: se já tem conta, matricula; se não, cria convite
 - Ao se cadastrar, convites pendentes são processados automaticamente
-- Usuário vê apenas os cursos para os quais foi matriculado
+- Usuário vê apenas os conteúdos para os quais foi matriculado
 
 ### Roles
 
 - **Admin**: Acesso total a todas organizações (admin@adventurelabs.com.br)
-- **Tenant**: Gerencia cursos e alunos da sua organizacao (lidera@adventurelabs.com.br, contato@somoslidera.com.br)
-- **Student**: Acessa cursos matriculados, faz anotacoes, completa tarefas
+- **Tenant**: Gerencia conteúdos e alunos da sua organizacao (lidera@adventurelabs.com.br, contato@somoslidera.com.br)
+- **Student**: Acessa conteúdos matriculados, faz anotacoes, completa tarefas
 
 ## Rotas
 
 ### Area do Aluno
 - `/learn` - Dashboard de boas-vindas
-- `/learn/courses` - Lista de cursos matriculados
-- `/learn/courses/[id]` - Modulos do curso
+- `/learn/courses` - Lista de conteúdos matriculados
+- `/learn/courses/[id]` - Modulos do conteúdo
 - `/learn/lessons/[id]` - Aula com video, tarefas e anotacoes
 - `/learn/settings` - Preferencias do usuario
 
 ### Painel do Tenant
 - `/manage` - Dashboard de gestao
-- `/manage/courses` - Gerenciar cursos
-- `/manage/courses/new` - Criar novo curso
-- `/manage/courses/[id]` - Editar curso e modulos
+- `/manage/courses` - Gerenciar conteúdos
+- `/manage/courses/new` - Criar novo conteúdo
+- `/manage/courses/[id]` - Editar conteúdo e modulos
 - `/manage/students` - Gerenciar alunos e matriculas
 
 ### Painel Admin
@@ -84,13 +84,13 @@ supabase start
 supabase db reset   # aplica migrations + seed em um comando
 ```
 
-O seed já inclui organizações, 4 cursos com módulos/aulas, e **usuários de teste** (senha de todos: `password123`):
+O seed já inclui organizações, 4 conteúdos com módulos/aulas, e **usuários de teste** (senha de todos: `password123`):
 
 | Email | Senha | Papel |
 |-------|--------|--------|
 | admin@adventurelabs.com.br | password123 | Admin (criar orgs, ver tudo) |
-| lidera@adventurelabs.com.br | password123 | Tenant (criar cursos da Lidera) |
-| aluno@adventurelabs.com.br | password123 | Aluno (cursos matriculados) |
+| lidera@adventurelabs.com.br | password123 | Tenant (criar conteúdos da Lidera) |
+| aluno@adventurelabs.com.br | password123 | Aluno (conteúdos matriculados) |
 
 **Opção B – Supabase remoto (Dashboard)**
 
@@ -120,7 +120,7 @@ A preferencia e salva em localStorage.
 
 ### Configurar Usuarios Iniciais
 
-Se você **não** usou o seed (que já cria admin/tenant/aluno), faça o primeiro cadastro em `/auth/signup` e depois no SQL Editor ou use `supabase/setup-admin.sql` (edite o email). **Ordem no app:** só admin cria organizações; para criar curso é preciso ter uma organização (tenant/admin com org_id, ou admin escolhendo a org na tela Novo curso); alunos são adicionados depois por e-mail. Não é necessário cadastrar aluno para cadastrar curso.
+Se você **não** usou o seed (que já cria admin/tenant/aluno), faça o primeiro cadastro em `/auth/signup` e depois no SQL Editor ou use `supabase/setup-admin.sql` (edite o email). **Ordem no app:** só admin cria organizações; para criar conteúdo é preciso ter uma organização (tenant/admin com org_id, ou admin escolhendo a org na tela Novo conteúdo); alunos são adicionados depois por e-mail. Não é necessário cadastrar aluno para cadastrar conteúdo.
 
 ```sql
 -- Configurar admin
@@ -134,7 +134,7 @@ SET role = 'tenant', org_id = '00000000-0000-0000-0000-000000000002'
 WHERE email IN ('lidera@adventurelabs.com.br', 'contato@somoslidera.com.br');
 ```
 
-Para **criar curso**: não é preciso cadastrar aluno antes; é preciso ter organização e ser tenant ou admin (admin sem org pode escolher a org na tela "Novo curso").
+Para **criar conteúdo**: não é preciso cadastrar aluno antes; é preciso ter organização e ser tenant ou admin (admin sem org pode escolher a org na tela "Novo conteúdo").
 
 ### Deploy na Vercel
 

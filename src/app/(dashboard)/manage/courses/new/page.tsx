@@ -4,8 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { NewCourseClient } from "../new-course-client";
 
 export const metadata: Metadata = {
-  title: "Novo Curso",
-  description: "Criar um novo curso",
+  title: "Novo Conteúdo",
+  description: "Criar um novo conteúdo",
 };
 
 export default async function NewCoursePage() {
@@ -39,12 +39,12 @@ export default async function NewCoursePage() {
     <div className="space-y-6 max-w-2xl">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          Novo Curso
+          Novo Conteúdo
         </h1>
         <p className="text-slate-500">
           {orgId
-            ? "Crie um novo curso para seus alunos"
-            : "Escolha a organização e preencha os dados do curso"}
+            ? "Crie um novo conteúdo para seus alunos"
+            : "Escolha a organização e preencha os dados do conteúdo"}
         </p>
       </div>
 

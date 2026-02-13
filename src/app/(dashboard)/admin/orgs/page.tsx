@@ -51,7 +51,7 @@ export default async function AdminOrgsPage() {
         <EmptyState
           icon={Building2}
           title="Nenhuma organização cadastrada"
-          description="Crie sua primeira organização para começar a gerenciar cursos e alunos. Use o botão acima."
+          description="Crie sua primeira organização para começar a gerenciar conteúdos e alunos. Use o botão acima."
         />
       ) : (
         <div className="grid gap-4">
@@ -83,7 +83,7 @@ export default async function AdminOrgsPage() {
                       <p className="font-semibold text-slate-900 dark:text-slate-100">
                         {org.courses?.length || 0}
                       </p>
-                      <p>cursos</p>
+                      <p>conteúdos</p>
                     </div>
                   </div>
                 </div>

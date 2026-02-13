@@ -111,7 +111,7 @@ export default async function ManageStudentsPage() {
               Convites pendentes ({pendingInvites.length})
             </h3>
             <p className="text-sm text-slate-500 mb-3">
-              Estas pessoas foram convidadas e verão os cursos ao se cadastrarem.
+              Estas pessoas foram convidadas e verão os conteúdos ao se cadastrarem.
             </p>
             <div className="space-y-2">
               {pendingInvites.map((inv: { id: string; email: string; full_name: string | null; created_at: string }) => (

@@ -124,7 +124,7 @@ export default async function LearnPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">
-              Cursos Ativos
+              Conteúdos Ativos
             </CardTitle>
             <BookOpen className="h-4 w-4 text-blue-600" />
           </CardHeader>
@@ -196,10 +196,10 @@ export default async function LearnPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-blue-600" />
-                Meus Cursos
+                Meus Conteúdos
               </CardTitle>
               <CardDescription>
-                Acesse seus cursos e continue aprendendo
+                Acesse seus conteúdos e continue aprendendo
               </CardDescription>
             </CardHeader>
           </Card>

@@ -8,8 +8,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Gerenciar Cursos",
-  description: "Gerencie seus cursos",
+  title: "Gerenciar Conteúdos",
+  description: "Gerencie seus conteúdos",
 };
 
 export default async function ManageCoursesPage() {
@@ -47,14 +47,14 @@ export default async function ManageCoursesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Cursos
+            Conteúdos
           </h1>
-          <p className="text-slate-500">Gerencie seus cursos</p>
+          <p className="text-slate-500">Gerencie seus conteúdos</p>
         </div>
         <Link href="/manage/courses/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Novo Curso
+            Novo Conteúdo
           </Button>
         </Link>
       </div>
@@ -64,15 +64,15 @@ export default async function ManageCoursesPage() {
           <CardContent>
             <BookOpen className="h-12 w-12 text-slate-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">
-              Nenhum curso criado
+              Nenhum conteúdo criado
             </h3>
             <p className="text-slate-500 mt-2">
-              Comece criando seu primeiro curso
+              Comece criando seu primeiro conteúdo
             </p>
             <Link href="/manage/courses/new">
               <Button className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
-                Criar Curso
+                Criar Conteúdo
               </Button>
             </Link>
           </CardContent>

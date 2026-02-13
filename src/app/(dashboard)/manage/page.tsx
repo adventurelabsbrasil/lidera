@@ -49,7 +49,7 @@ export default async function ManagePage() {
     <div className="space-y-8">
       <PageHeader
         title="Painel de Gestão"
-        description="Gerencie seus cursos e alunos"
+        description="Gerencie seus conteúdos e alunos"
       />
 
       {/* Stats */}
@@ -57,7 +57,7 @@ export default async function ManagePage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">
-              Cursos
+              Conteúdos
             </CardTitle>
             <GraduationCap className="h-4 w-4 text-blue-600" />
           </CardHeader>
@@ -98,10 +98,10 @@ export default async function ManagePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <GraduationCap className="h-5 w-5 text-blue-600" />
-                Gerenciar Cursos
+                Gerenciar Conteúdos
               </CardTitle>
               <CardDescription>
-                Criar, editar e organizar seus cursos
+                Criar, editar e organizar seus conteúdos
               </CardDescription>
             </CardHeader>
           </Card>

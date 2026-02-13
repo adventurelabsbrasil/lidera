@@ -22,7 +22,7 @@ export async function generateMetadata({
     .single();
 
   return {
-    title: course?.title || "Curso",
+    title: course?.title || "Conteúdo",
   };
 }
 
@@ -135,7 +135,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
       <Card>
         <CardContent className="py-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium">Progresso do curso</span>
+            <span className="text-sm font-medium">Progresso do conteúdo</span>
             <span className="text-sm text-slate-500">
               {Math.round((completedCount / totalLessons) * 100) || 0}%
             </span>

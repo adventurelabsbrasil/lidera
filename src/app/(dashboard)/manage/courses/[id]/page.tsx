@@ -21,7 +21,7 @@ export async function generateMetadata({
     .single();
 
   return {
-    title: `Editar: ${course?.title || "Curso"}`,
+    title: `Editar: ${course?.title || "Conteúdo"}`,
   };
 }
 
@@ -83,7 +83,7 @@ export default async function EditCoursePage({ params }: EditCoursePageProps) {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-          Editar Curso
+          Editar Conteúdo
         </h1>
         <p className="text-slate-500">{course.title}</p>
       </div>

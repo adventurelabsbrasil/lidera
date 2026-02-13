@@ -4,10 +4,13 @@
 -- ============================================
 -- ORGANIZATIONS
 -- ============================================
-INSERT INTO organizations (id, name, slug, domain, settings) VALUES
-    ('00000000-0000-0000-0000-000000000001', 'Adventure Labs', 'adventurelabs', 'adventurelabs.com.br', '{"theme": "blue"}'),
-    ('00000000-0000-0000-0000-000000000002', 'Lidera Consultoria', 'lidera', 'lidera.adventurelabs.com.br', '{"theme": "purple"}')
-ON CONFLICT (id) DO NOTHING;
+INSERT INTO organizations (id, name, slug, domain, logo_url, settings) VALUES
+    ('00000000-0000-0000-0000-000000000001', 'Adventure Labs', 'adventurelabs', 'adventurelabs.com.br', 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=200', '{"theme": "blue"}'),
+    ('00000000-0000-0000-0000-000000000002', 'Lidera Consultoria', 'lidera', 'lidera.adventurelabs.com.br', 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=200', '{"theme": "purple"}'),
+    ('00000000-0000-0000-0000-000000000003', 'Acme Corp', 'acme', 'acme.com.br', 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=200', '{"theme": "green"}'),
+    ('00000000-0000-0000-0000-000000000004', 'Tech Institute', 'techinstitute', 'techinstitute.com.br', 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=200', '{"theme": "orange"}'),
+    ('00000000-0000-0000-0000-000000000005', 'Inovacao e Talentos', 'inovacao', 'inovacao.com.br', 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=200', '{"theme": "indigo"}')
+ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, logo_url = EXCLUDED.logo_url, settings = EXCLUDED.settings;
 
 -- ============================================
 -- NOTE: Profiles are created automatically when users sign up via Supabase Auth
@@ -360,12 +363,34 @@ INSERT INTO auth.identities (
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
 
+-- Alunos ficticios adicionais (senha: password123)
+INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at) VALUES
+    ('d1a0a0f1-96a0-7a6d-a9a2-7a7624628b80', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'maria.silva@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Maria Silva"}', NOW(), NOW()),
+    ('e2b1b1a2-a7b1-8b7e-b0b3-8b8735739c91', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'joao.santos@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Joao Santos"}', NOW(), NOW()),
+    ('f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'ana.oliveira@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ana Oliveira"}', NOW(), NOW()),
+    ('a4d3d3c4-c9d3-0d9a-d2d5-0da95795be13', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'pedro.costa@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Pedro Costa"}', NOW(), NOW()),
+    ('b5e4e4d5-d0e4-1e0b-e3e6-1eba6086cf24', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'carla.lima@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Carla Lima"}', NOW(), NOW())
+ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at) VALUES
+    ('d1a0a0f1-96a0-7a6d-a9a2-7a7624628b80', 'd1a0a0f1-96a0-7a6d-a9a2-7a7624628b80', 'maria.silva@adventurelabs.com.br', '{"sub":"d1a0a0f1-96a0-7a6d-a9a2-7a7624628b80","email":"maria.silva@adventurelabs.com.br"}', 'email', NOW(), NOW(), NOW()),
+    ('e2b1b1a2-a7b1-8b7e-b0b3-8b8735739c91', 'e2b1b1a2-a7b1-8b7e-b0b3-8b8735739c91', 'joao.santos@adventurelabs.com.br', '{"sub":"e2b1b1a2-a7b1-8b7e-b0b3-8b8735739c91","email":"joao.santos@adventurelabs.com.br"}', 'email', NOW(), NOW(), NOW()),
+    ('f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02', 'f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02', 'ana.oliveira@adventurelabs.com.br', '{"sub":"f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02","email":"ana.oliveira@adventurelabs.com.br"}', 'email', NOW(), NOW(), NOW()),
+    ('a4d3d3c4-c9d3-0d9a-d2d5-0da95795be13', 'a4d3d3c4-c9d3-0d9a-d2d5-0da95795be13', 'pedro.costa@adventurelabs.com.br', '{"sub":"a4d3d3c4-c9d3-0d9a-d2d5-0da95795be13","email":"pedro.costa@adventurelabs.com.br"}', 'email', NOW(), NOW(), NOW()),
+    ('b5e4e4d5-d0e4-1e0b-e3e6-1eba6086cf24', 'b5e4e4d5-d0e4-1e0b-e3e6-1eba6086cf24', 'carla.lima@adventurelabs.com.br', '{"sub":"b5e4e4d5-d0e4-1e0b-e3e6-1eba6086cf24","email":"carla.lima@adventurelabs.com.br"}', 'email', NOW(), NOW(), NOW())
+ON CONFLICT (id) DO NOTHING;
+
 -- Atualizar profiles (trigger ja criou com role student)
 UPDATE profiles SET role = 'admin', org_id = '00000000-0000-0000-0000-000000000001' WHERE id = 'a87b7dc8-63dd-4d3a-8679-4743f13f585d';
 UPDATE profiles SET role = 'tenant', org_id = '00000000-0000-0000-0000-000000000002' WHERE id = 'b98c8ed9-74ee-5e4b-9780-58540240696e';
 UPDATE profiles SET role = 'student', org_id = '00000000-0000-0000-0000-000000000002' WHERE id = 'c09d9fe0-85ff-6f5c-a891-696513517a7f';
+UPDATE profiles SET role = 'student', org_id = '00000000-0000-0000-0000-000000000002' WHERE id = 'd1a0a0f1-96a0-7a6d-a9a2-7a7624628b80';
+UPDATE profiles SET role = 'student', org_id = '00000000-0000-0000-0000-000000000002' WHERE id = 'e2b1b1a2-a7b1-8b7e-b0b3-8b8735739c91';
+UPDATE profiles SET role = 'student', org_id = '00000000-0000-0000-0000-000000000002' WHERE id = 'f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02';
+UPDATE profiles SET role = 'student', org_id = '00000000-0000-0000-0000-000000000002' WHERE id = 'a4d3d3c4-c9d3-0d9a-d2d5-0da95795be13';
+UPDATE profiles SET role = 'student', org_id = '00000000-0000-0000-0000-000000000002' WHERE id = 'b5e4e4d5-d0e4-1e0b-e3e6-1eba6086cf24';
 
--- Matriculas do admin e do aluno em todos os cursos (Lidera)
+-- Matriculas do admin e dos alunos em todos os cursos (Lidera)
 INSERT INTO enrollments (user_id, course_id, status) VALUES
     ('a87b7dc8-63dd-4d3a-8679-4743f13f585d', '00000000-0000-0000-0001-000000000001', 'active'),
     ('a87b7dc8-63dd-4d3a-8679-4743f13f585d', '00000000-0000-0000-0001-000000000002', 'active'),
@@ -374,5 +399,18 @@ INSERT INTO enrollments (user_id, course_id, status) VALUES
     ('c09d9fe0-85ff-6f5c-a891-696513517a7f', '00000000-0000-0000-0001-000000000001', 'active'),
     ('c09d9fe0-85ff-6f5c-a891-696513517a7f', '00000000-0000-0000-0001-000000000002', 'active'),
     ('c09d9fe0-85ff-6f5c-a891-696513517a7f', '00000000-0000-0000-0001-000000000003', 'active'),
-    ('c09d9fe0-85ff-6f5c-a891-696513517a7f', '00000000-0000-0000-0001-000000000004', 'active')
+    ('c09d9fe0-85ff-6f5c-a891-696513517a7f', '00000000-0000-0000-0001-000000000004', 'active'),
+    ('d1a0a0f1-96a0-7a6d-a9a2-7a7624628b80', '00000000-0000-0000-0001-000000000001', 'active'),
+    ('d1a0a0f1-96a0-7a6d-a9a2-7a7624628b80', '00000000-0000-0000-0001-000000000002', 'active'),
+    ('d1a0a0f1-96a0-7a6d-a9a2-7a7624628b80', '00000000-0000-0000-0001-000000000003', 'active'),
+    ('e2b1b1a2-a7b1-8b7e-b0b3-8b8735739c91', '00000000-0000-0000-0001-000000000001', 'active'),
+    ('e2b1b1a2-a7b1-8b7e-b0b3-8b8735739c91', '00000000-0000-0000-0001-000000000004', 'active'),
+    ('f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02', '00000000-0000-0000-0001-000000000001', 'active'),
+    ('f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02', '00000000-0000-0000-0001-000000000002', 'active'),
+    ('f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02', '00000000-0000-0000-0001-000000000003', 'active'),
+    ('f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02', '00000000-0000-0000-0001-000000000004', 'active'),
+    ('a4d3d3c4-c9d3-0d9a-d2d5-0da95795be13', '00000000-0000-0000-0001-000000000002', 'active'),
+    ('a4d3d3c4-c9d3-0d9a-d2d5-0da95795be13', '00000000-0000-0000-0001-000000000003', 'active'),
+    ('b5e4e4d5-d0e4-1e0b-e3e6-1eba6086cf24', '00000000-0000-0000-0001-000000000001', 'active'),
+    ('b5e4e4d5-d0e4-1e0b-e3e6-1eba6086cf24', '00000000-0000-0000-0001-000000000004', 'active')
 ON CONFLICT (user_id, course_id) DO NOTHING;

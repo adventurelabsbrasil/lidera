@@ -77,7 +77,7 @@ export default async function AdminPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-slate-500">
-              Cursos Totais
+              Conteúdos Totais
             </CardTitle>
             <GraduationCap className="h-4 w-4 text-purple-600" />
           </CardHeader>

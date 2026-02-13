@@ -34,7 +34,7 @@ const navItems: NavItem[] = [
     roles: ["student", "tenant", "admin"],
   },
   {
-    title: "Meus Cursos",
+    title: "Meus Conteúdos",
     href: "/learn/courses",
     icon: BookOpen,
     roles: ["student", "tenant", "admin"],
@@ -53,7 +53,7 @@ const navItems: NavItem[] = [
     roles: ["tenant", "admin"],
   },
   {
-    title: "Cursos",
+    title: "Conteúdos",
     href: "/manage/courses",
     icon: GraduationCap,
     roles: ["tenant", "admin"],

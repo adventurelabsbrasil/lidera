@@ -34,7 +34,7 @@ export function AddStudentDialog({ orgId, courses, invitedBy }: AddStudentDialog
     const supabase = createClient();
 
     if (selectedCourses.length === 0) {
-      setError("Selecione pelo menos um curso.");
+      setError("Selecione pelo menos um conteúdo.");
       setLoading(false);
       return;
     }
@@ -117,7 +117,7 @@ export function AddStudentDialog({ orgId, courses, invitedBy }: AddStudentDialog
         <h2 className="text-xl font-semibold mb-4">Adicionar Aluno</h2>
         <p className="text-sm text-slate-500 mb-4">
           Se a pessoa já tem conta, será matriculada. Se não, criaremos um
-          convite e ela verá os cursos ao se cadastrar.
+          convite e ela verá os conteúdos ao se cadastrar.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">

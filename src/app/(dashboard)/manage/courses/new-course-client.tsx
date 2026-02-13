@@ -42,7 +42,7 @@ export function NewCourseClient({
     <div className="space-y-6">
       <Card>
         <CardContent className="p-6">
-          <Label htmlFor="org" className="block mb-2">Organização do curso *</Label>
+          <Label htmlFor="org" className="block mb-2">Organização do conteúdo *</Label>
           <select
             id="org"
             value={selectedOrgId ?? ""}

@@ -8,8 +8,8 @@ import Image from "next/image";
 import { getAuthUser } from "@/lib/supabase/auth-helpers";
 
 export const metadata: Metadata = {
-  title: "Meus Cursos",
-  description: "Seus cursos matriculados",
+  title: "Meus Conteúdos",
+  description: "Seus conteúdos matriculados",
 };
 
 export default async function CoursesPage() {
@@ -77,11 +77,11 @@ export default async function CoursesPage() {
   if (!coursesWithProgress?.length) {
     return (
       <div className="space-y-6">
-        <PageHeader title="Meus Cursos" description="Seus cursos matriculados" />
+        <PageHeader title="Meus Conteúdos" description="Seus conteúdos matriculados" />
         <EmptyState
           icon={BookOpen}
-          title="Nenhum curso encontrado"
-          description="Você ainda não está matriculado em nenhum curso. Entre em contato com seu administrador para obter acesso."
+          title="Nenhum conteúdo encontrado"
+          description="Você ainda não está matriculado em nenhum conteúdo. Entre em contato com seu administrador para obter acesso."
         />
       </div>
     );
@@ -90,8 +90,8 @@ export default async function CoursesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Meus Cursos"
-        description={`${coursesWithProgress.length} curso(s) ativo(s)`}
+        title="Meus Conteúdos"
+        description={`${coursesWithProgress.length} conteúdo(s) ativo(s)`}
       />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
