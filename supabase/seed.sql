@@ -217,7 +217,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- ============================================
 -- USUARIOS FICTICIOS (auth + profile)
--- Senha de todos: password123
+-- Senha inicial: adv123 (podem trocar depois via email)
 -- Apos o trigger criar o profile, atualizamos role e org_id.
 -- ============================================
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -234,19 +234,27 @@ INSERT INTO auth.users (
     raw_app_meta_data,
     raw_user_meta_data,
     created_at,
-    updated_at
+    updated_at,
+    confirmation_token,
+    email_change,
+    email_change_token_new,
+    recovery_token
 ) VALUES (
     'a87b7dc8-63dd-4d3a-8679-4743f13f585d',
     '00000000-0000-0000-0000-000000000000',
     'authenticated',
     'authenticated',
     'admin@adventurelabs.com.br',
-    crypt('password123', gen_salt('bf')),
+    crypt('adv123', gen_salt('bf')),
     NOW(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Admin Lidera"}',
     NOW(),
-    NOW()
+    NOW(),
+    '',
+    '',
+    '',
+    ''
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO auth.identities (
@@ -281,19 +289,27 @@ INSERT INTO auth.users (
     raw_app_meta_data,
     raw_user_meta_data,
     created_at,
-    updated_at
+    updated_at,
+    confirmation_token,
+    email_change,
+    email_change_token_new,
+    recovery_token
 ) VALUES (
     'b98c8ed9-74ee-5e4b-9780-58540240696e',
     '00000000-0000-0000-0000-000000000000',
     'authenticated',
     'authenticated',
     'lidera@adventurelabs.com.br',
-    crypt('password123', gen_salt('bf')),
+    crypt('adv123', gen_salt('bf')),
     NOW(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Gestor Lidera"}',
     NOW(),
-    NOW()
+    NOW(),
+    '',
+    '',
+    '',
+    ''
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO auth.identities (
@@ -328,19 +344,27 @@ INSERT INTO auth.users (
     raw_app_meta_data,
     raw_user_meta_data,
     created_at,
-    updated_at
+    updated_at,
+    confirmation_token,
+    email_change,
+    email_change_token_new,
+    recovery_token
 ) VALUES (
     'c09d9fe0-85ff-6f5c-a891-696513517a7f',
     '00000000-0000-0000-0000-000000000000',
     'authenticated',
     'authenticated',
     'aluno@adventurelabs.com.br',
-    crypt('password123', gen_salt('bf')),
+    crypt('adv123', gen_salt('bf')),
     NOW(),
     '{"provider":"email","providers":["email"]}',
     '{"full_name":"Aluno Demo"}',
     NOW(),
-    NOW()
+    NOW(),
+    '',
+    '',
+    '',
+    ''
 ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO auth.identities (
@@ -363,13 +387,13 @@ INSERT INTO auth.identities (
     NOW()
 ) ON CONFLICT (id) DO NOTHING;
 
--- Alunos ficticios adicionais (senha: password123)
-INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at) VALUES
-    ('d1a0a0f1-96a0-7a6d-a9a2-7a7624628b80', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'maria.silva@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Maria Silva"}', NOW(), NOW()),
-    ('e2b1b1a2-a7b1-8b7e-b0b3-8b8735739c91', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'joao.santos@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Joao Santos"}', NOW(), NOW()),
-    ('f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'ana.oliveira@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ana Oliveira"}', NOW(), NOW()),
-    ('a4d3d3c4-c9d3-0d9a-d2d5-0da95795be13', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'pedro.costa@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Pedro Costa"}', NOW(), NOW()),
-    ('b5e4e4d5-d0e4-1e0b-e3e6-1eba6086cf24', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'carla.lima@adventurelabs.com.br', crypt('password123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Carla Lima"}', NOW(), NOW())
+-- Alunos ficticios adicionais (senha: adv123)
+INSERT INTO auth.users (id, instance_id, aud, role, email, encrypted_password, email_confirmed_at, raw_app_meta_data, raw_user_meta_data, created_at, updated_at, confirmation_token, email_change, email_change_token_new, recovery_token) VALUES
+    ('d1a0a0f1-96a0-7a6d-a9a2-7a7624628b80', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'maria.silva@adventurelabs.com.br', crypt('adv123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Maria Silva"}', NOW(), NOW(), '', '', '', ''),
+    ('e2b1b1a2-a7b1-8b7e-b0b3-8b8735739c91', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'joao.santos@adventurelabs.com.br', crypt('adv123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Joao Santos"}', NOW(), NOW(), '', '', '', ''),
+    ('f3c2c2b3-b8c2-9c8f-c1c4-9c984684ad02', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'ana.oliveira@adventurelabs.com.br', crypt('adv123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Ana Oliveira"}', NOW(), NOW(), '', '', '', ''),
+    ('a4d3d3c4-c9d3-0d9a-d2d5-0da95795be13', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'pedro.costa@adventurelabs.com.br', crypt('adv123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Pedro Costa"}', NOW(), NOW(), '', '', '', ''),
+    ('b5e4e4d5-d0e4-1e0b-e3e6-1eba6086cf24', '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated', 'carla.lima@adventurelabs.com.br', crypt('adv123', gen_salt('bf')), NOW(), '{"provider":"email","providers":["email"]}', '{"full_name":"Carla Lima"}', NOW(), NOW(), '', '', '', '')
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at) VALUES

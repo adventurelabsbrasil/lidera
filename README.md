@@ -84,13 +84,13 @@ supabase start
 supabase db reset   # aplica migrations + seed em um comando
 ```
 
-O seed já inclui organizações, 4 conteúdos com módulos/aulas, e **usuários de teste** (senha de todos: `password123`):
+O seed já inclui organizações, 4 conteúdos com módulos/aulas, e **usuários de teste** (senha inicial: `adv123` — podem trocar depois via email):
 
 | Email | Senha | Papel |
 |-------|--------|--------|
-| admin@adventurelabs.com.br | password123 | Admin (criar orgs, ver tudo) |
-| lidera@adventurelabs.com.br | password123 | Tenant (criar conteúdos da Lidera) |
-| aluno@adventurelabs.com.br | password123 | Aluno (conteúdos matriculados) |
+| admin@adventurelabs.com.br | adv123 | Admin (criar orgs, ver tudo) |
+| lidera@adventurelabs.com.br | adv123 | Tenant (criar conteúdos da Lidera) |
+| aluno@adventurelabs.com.br | adv123 | Aluno (conteúdos matriculados) |
 
 **Opção B – Supabase remoto (Dashboard)**
 

@@ -14,12 +14,13 @@ CREATE TABLE IF NOT EXISTS pending_invites (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_pending_invites_email ON pending_invites(LOWER(email));
-CREATE INDEX idx_pending_invites_org ON pending_invites(org_id);
+CREATE INDEX IF NOT EXISTS idx_pending_invites_email ON pending_invites(LOWER(email));
+CREATE INDEX IF NOT EXISTS idx_pending_invites_org ON pending_invites(org_id);
 
 -- RLS
 ALTER TABLE pending_invites ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Tenants can manage pending invites for their org" ON pending_invites;
 CREATE POLICY "Tenants can manage pending invites for their org"
     ON pending_invites FOR ALL
     TO authenticated
@@ -33,6 +34,7 @@ CREATE POLICY "Tenants can manage pending invites for their org"
     );
 
 -- Tenants can update student profiles when enrolling (set org_id, full_name)
+DROP POLICY IF EXISTS "Tenants can update student profiles on enroll" ON profiles;
 CREATE POLICY "Tenants can update student profiles on enroll"
     ON profiles FOR UPDATE
     TO authenticated
