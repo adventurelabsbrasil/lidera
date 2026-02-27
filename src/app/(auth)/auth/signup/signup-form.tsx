@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
+import { createAuthClient } from "@/lib/supabase/client";
 import {
   Button,
   Card,
@@ -32,8 +32,8 @@ export function SignupForm() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const authClient = createAuthClient();
+    const { error } = await authClient.auth.signUp({
       email,
       password,
       options: {
@@ -48,13 +48,11 @@ export function SignupForm() {
       return;
     }
 
-    const { data } = await supabase.auth.getSession();
+    const { data } = await authClient.auth.getSession();
     setLoading(false);
 
     if (data.session?.user) {
-      await supabase.rpc("process_pending_invites", {
-        p_user_id: data.session.user.id,
-      });
+      await fetch("/api/auth/process-invites", { method: "POST" });
       router.push(redirect);
       router.refresh();
     } else {
@@ -66,8 +64,8 @@ export function SignupForm() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
+    const authClient = createAuthClient();
+    const { error } = await authClient.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback?redirect=${redirect}`,

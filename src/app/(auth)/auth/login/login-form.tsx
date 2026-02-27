@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createAuthClient } from "@/lib/supabase/client";
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from "@/components/ui";
 import { Loader2 } from "lucide-react";
 
@@ -21,8 +21,8 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
+    const authClient = createAuthClient();
+    const { error } = await authClient.auth.signInWithPassword({
       email,
       password,
     });
@@ -33,12 +33,7 @@ export function LoginForm() {
       return;
     }
 
-    const { data } = await supabase.auth.getSession();
-    if (data.session?.user) {
-      await supabase.rpc("process_pending_invites", {
-        p_user_id: data.session.user.id,
-      });
-    }
+    await fetch("/api/auth/process-invites", { method: "POST" });
     router.push(redirect);
     router.refresh();
   }
@@ -47,8 +42,8 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
+    const authClient = createAuthClient();
+    const { error } = await authClient.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback?redirect=${redirect}`,

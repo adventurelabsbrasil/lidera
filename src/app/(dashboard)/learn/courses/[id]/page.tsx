@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { BookOpen, CheckCircle, ChevronRight, Clock, PlayCircle } from "lucide-react";
 import Link from "next/link";
@@ -14,12 +14,10 @@ export async function generateMetadata({
   params,
 }: CoursePageProps): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: course } = await supabase
-    .from("courses")
-    .select("title")
-    .eq("id", id)
-    .single();
+  const dataClient = await createDataClient();
+  const { data: course } = dataClient
+    ? await dataClient.from("courses").select("title").eq("id", id).single()
+    : { data: null };
 
   return {
     title: course?.title || "Conteúdo",
@@ -28,16 +26,20 @@ export async function generateMetadata({
 
 export default async function CoursePage({ params }: CoursePageProps) {
   const { id } = await params;
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
+  if (!user) redirect("/auth/login");
+
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/auth/login");
 
   // Check enrollment
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await dataClient
     .from("enrollments")
     .select("*")
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .eq("course_id", id)
     .eq("status", "active")
     .single();
@@ -47,7 +49,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   }
 
   // Get course with modules and lessons
-  const { data: course } = await supabase
+  const { data: course } = await dataClient
     .from("courses")
     .select(`
       *,
@@ -72,10 +74,10 @@ export default async function CoursePage({ params }: CoursePageProps) {
   }
 
   // Get user progress
-  const { data: progress } = await supabase
+  const { data: progress } = await dataClient
     .from("lesson_progress")
     .select("lesson_id, completed")
-    .eq("user_id", user!.id);
+    .eq("user_id", user.id);
 
   const completedLessonIds = new Set(
     progress?.filter((p) => p.completed).map((p) => p.lesson_id) || []

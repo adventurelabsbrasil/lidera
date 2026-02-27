@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createDataClient } from "@/lib/supabase/client";
 import { getYouTubeVideoId } from "@/lib/utils";
 import { Button } from "@/components/ui";
 import { CheckCircle, Play } from "lucide-react";
@@ -27,9 +27,9 @@ export function VideoPlayer({
 
   async function markAsCompleted() {
     setMarking(true);
-    const supabase = createClient();
+    const dataClient = createDataClient();
 
-    const { error } = await supabase.from("lesson_progress").upsert(
+    const { error } = await dataClient.from("lesson_progress").upsert(
       {
         user_id: userId,
         lesson_id: lessonId,

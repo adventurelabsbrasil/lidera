@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader, EmptyState } from "@/components/ui";
 import { BookOpen, PlayCircle } from "lucide-react";
 import Link from "next/link";
@@ -13,12 +13,15 @@ export const metadata: Metadata = {
 };
 
 export default async function CoursesPage() {
-  const supabase = await createClient();
-  const user = await getAuthUser(supabase);
+  const authClient = await createAuthClient();
+  const user = await getAuthUser(authClient);
   if (!user) redirect("/auth/login");
 
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/auth/login");
+
   // Get enrolled courses with details
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await dataClient
     .from("enrollments")
     .select(`
       *,
@@ -37,7 +40,7 @@ export default async function CoursesPage() {
     .eq("status", "active");
 
   // Get user's lesson progress
-  const { data: progress } = await supabase
+  const { data: progress } = await dataClient
     .from("lesson_progress")
     .select("lesson_id, completed")
     .eq("user_id", user.id)

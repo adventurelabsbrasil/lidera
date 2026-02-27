@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { DashboardHeader, DashboardSidebar } from "@/components/layouts";
 import { ViewSwitcherProvider } from "@/lib/context/view-switcher-context";
+import { LideraSessionProvider } from "@/lib/context/lidera-session-context";
 import type { UserRole } from "@/types/database";
 
 export default async function DashboardLayout({
@@ -9,21 +10,23 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
 
   if (!user) {
     redirect("/auth/login");
   }
 
-  // Get user profile
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*, organizations(name)")
-    .eq("id", user.id)
-    .single();
+  const dataClient = await createDataClient();
+  const { data: profile } = dataClient
+    ? await dataClient
+        .from("profiles")
+        .select("*, organizations(name)")
+        .eq("id", user.id)
+        .single()
+    : { data: null };
 
   // Default to student if no profile exists yet
   const userRole: UserRole = profile?.role || "student";
@@ -32,7 +35,8 @@ export default async function DashboardLayout({
 
   return (
     <ViewSwitcherProvider userRole={userRole}>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <LideraSessionProvider>
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
         <DashboardSidebar
           userRole={userRole}
           userName={userName}
@@ -46,7 +50,8 @@ export default async function DashboardLayout({
         <main className="lg:pl-64">
           <div className="p-4 lg:p-8">{children}</div>
         </main>
-      </div>
+        </div>
+      </LideraSessionProvider>
     </ViewSwitcherProvider>
   );
 }

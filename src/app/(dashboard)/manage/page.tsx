@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from "@/components/ui";
 import { BookOpen, GraduationCap, Users } from "lucide-react";
 import Link from "next/link";
@@ -11,13 +11,16 @@ export const metadata: Metadata = {
 };
 
 export default async function ManagePage() {
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
+
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/learn");
 
   // Check if user is tenant or admin
-  const { data: profile } = await supabase
+  const { data: profile } = await dataClient
     .from("profiles")
     .select("*")
     .eq("id", user!.id)
@@ -28,18 +31,18 @@ export default async function ManagePage() {
   }
 
   // Get stats for this organization
-  const { count: coursesCount } = await supabase
+  const { count: coursesCount } = await dataClient
     .from("courses")
     .select("*", { count: "exact", head: true })
     .eq("org_id", profile.org_id!);
 
-  const { count: studentsCount } = await supabase
+  const { count: studentsCount } = await dataClient
     .from("profiles")
     .select("*", { count: "exact", head: true })
     .eq("org_id", profile.org_id!)
     .eq("role", "student");
 
-  const { count: enrollmentsCount } = await supabase
+  const { count: enrollmentsCount } = await dataClient
     .from("enrollments")
     .select("*, courses!inner(*)", { count: "exact", head: true })
     .eq("courses.org_id", profile.org_id!)

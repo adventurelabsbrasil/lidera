@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createDataClient } from "@/lib/supabase/client";
 import { Button, Input, Label } from "@/components/ui";
 import { ChevronDown, ChevronRight, Loader2, Plus, Trash2 } from "lucide-react";
 
@@ -51,8 +51,8 @@ export function ModuleManager({ courseId, modules: initialModules }: ModuleManag
     if (!newModuleTitle.trim()) return;
     setAddingModule(true);
 
-    const supabase = createClient();
-    const { data, error } = await supabase
+    const dataClient = createDataClient();
+    const { data, error } = await dataClient
       .from("modules")
       .insert({
         course_id: courseId,
@@ -72,12 +72,12 @@ export function ModuleManager({ courseId, modules: initialModules }: ModuleManag
 
   async function addLesson(moduleId: string) {
     setLoading(moduleId);
-    const supabase = createClient();
+    const dataClient = createDataClient();
 
     const module = modules.find((m) => m.id === moduleId);
     const lessonsCount = module?.lessons.length || 0;
 
-    const { data, error } = await supabase
+    const { data, error } = await dataClient
       .from("lessons")
       .insert({
         module_id: moduleId,
@@ -107,9 +107,9 @@ export function ModuleManager({ courseId, modules: initialModules }: ModuleManag
     }
 
     setLoading(moduleId);
-    const supabase = createClient();
+    const dataClient = createDataClient();
 
-    const { error } = await supabase
+    const { error } = await dataClient
       .from("modules")
       .delete()
       .eq("id", moduleId);
@@ -127,9 +127,9 @@ export function ModuleManager({ courseId, modules: initialModules }: ModuleManag
     field: string,
     value: string | number
   ) {
-    const supabase = createClient();
+    const dataClient = createDataClient();
 
-    await supabase
+    await dataClient
       .from("lessons")
       .update({ [field]: value, updated_at: new Date().toISOString() })
       .eq("id", lessonId);
@@ -151,8 +151,8 @@ export function ModuleManager({ courseId, modules: initialModules }: ModuleManag
   async function deleteLesson(moduleId: string, lessonId: string) {
     if (!confirm("Tem certeza que deseja excluir esta aula?")) return;
 
-    const supabase = createClient();
-    const { error } = await supabase
+    const dataClient = createDataClient();
+    const { error } = await dataClient
       .from("lessons")
       .delete()
       .eq("id", lessonId);

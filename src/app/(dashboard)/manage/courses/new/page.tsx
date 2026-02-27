@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { NewCourseClient } from "../new-course-client";
 
 export const metadata: Metadata = {
@@ -9,12 +9,15 @@ export const metadata: Metadata = {
 };
 
 export default async function NewCoursePage() {
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
 
-  const { data: profile } = await supabase
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/learn");
+
+  const { data: profile } = await dataClient
     .from("profiles")
     .select("*")
     .eq("id", user!.id)
@@ -28,7 +31,7 @@ export default async function NewCoursePage() {
   let organizations: { id: string; name: string; slug: string }[] = [];
 
   if (profile.role === "admin" && !orgId) {
-    const { data: orgs } = await supabase
+    const { data: orgs } = await dataClient
       .from("organizations")
       .select("id, name, slug")
       .order("name");

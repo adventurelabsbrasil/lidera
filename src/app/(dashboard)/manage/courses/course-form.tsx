@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/client";
+import { createDataClient } from "@/lib/supabase/client";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/components/ui";
 import { Loader2, Save, Upload, X } from "lucide-react";
 import type { Course } from "@/types/database";
@@ -88,14 +88,14 @@ export function CourseForm({ orgId, course }: CourseFormProps) {
   async function uploadThumbnail(): Promise<string | null> {
     if (!thumbnailFile) return thumbnailUrl || null;
 
-    const supabase = createClient();
+    const dataClient = createDataClient();
     const ext = thumbnailFile.name.split(".").pop() || "jpg";
     const path = isEditing
       ? `${orgId}/${course!.id}/thumb.${ext}`
       : `${orgId}/${crypto.randomUUID()}/thumb.${ext}`;
 
     setUploading(true);
-    const { data, error: uploadError } = await supabase.storage
+    const { data, error: uploadError } = await dataClient.storage
       .from("course-thumbnails")
       .upload(path, thumbnailFile, { upsert: true });
 
@@ -106,7 +106,7 @@ export function CourseForm({ orgId, course }: CourseFormProps) {
       return null;
     }
 
-    const { data: urlData } = supabase.storage
+    const { data: urlData } = dataClient.storage
       .from("course-thumbnails")
       .getPublicUrl(data.path);
 
@@ -118,7 +118,7 @@ export function CourseForm({ orgId, course }: CourseFormProps) {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
+    const dataClient = createDataClient();
     let finalThumbnailUrl = thumbnailUrl;
 
     if (thumbnailFile) {
@@ -131,7 +131,7 @@ export function CourseForm({ orgId, course }: CourseFormProps) {
     }
 
     if (isEditing) {
-      const { error } = await supabase
+      const { error } = await dataClient
         .from("courses")
         .update({
           title,
@@ -148,7 +148,7 @@ export function CourseForm({ orgId, course }: CourseFormProps) {
         return;
       }
     } else {
-      const { error } = await supabase.from("courses").insert({
+      const { error } = await dataClient.from("courses").insert({
         org_id: orgId,
         title,
         description,

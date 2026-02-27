@@ -1,6 +1,6 @@
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { notFound, redirect } from "next/navigation";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { VideoPlayer } from "@/components/video-player";
 import { LessonTasks } from "@/components/lesson-tasks";
 import { LessonResources } from "@/components/lesson-resources";
@@ -17,12 +17,10 @@ export async function generateMetadata({
   params,
 }: LessonPageProps): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: lesson } = await supabase
-    .from("lessons")
-    .select("title")
-    .eq("id", id)
-    .single();
+  const dataClient = await createDataClient();
+  const { data: lesson } = dataClient
+    ? await dataClient.from("lessons").select("title").eq("id", id).single()
+    : { data: null };
 
   return {
     title: lesson?.title || "Aula",
@@ -31,13 +29,17 @@ export async function generateMetadata({
 
 export default async function LessonPage({ params }: LessonPageProps) {
   const { id } = await params;
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
+  if (!user) redirect("/auth/login");
+
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/auth/login");
 
   // Get lesson with module and course info
-  const { data: lesson } = await supabase
+  const { data: lesson } = await dataClient
     .from("lessons")
     .select(`
       *,
@@ -61,10 +63,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
   }
 
   // Check enrollment
-  const { data: enrollment } = await supabase
+  const { data: enrollment } = await dataClient
     .from("enrollments")
     .select("*")
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .eq("course_id", lesson.module?.course_id)
     .eq("status", "active")
     .single();
@@ -74,31 +76,31 @@ export default async function LessonPage({ params }: LessonPageProps) {
   }
 
   // Get user's note for this lesson
-  const { data: note } = await supabase
+  const { data: note } = await dataClient
     .from("notes")
     .select("*")
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .eq("lesson_id", id)
     .single();
 
   // Get user's task completions
-  const { data: taskCompletions } = await supabase
+  const { data: taskCompletions } = await dataClient
     .from("task_completions")
     .select("task_id")
-    .eq("user_id", user!.id);
+    .eq("user_id", user.id);
 
   const completedTaskIds = new Set(taskCompletions?.map((tc) => tc.task_id) || []);
 
   // Get user's progress
-  const { data: progress } = await supabase
+  const { data: progress } = await dataClient
     .from("lesson_progress")
     .select("*")
-    .eq("user_id", user!.id)
+    .eq("user_id", user.id)
     .eq("lesson_id", id)
     .single();
 
   // Get all lessons in this module for navigation
-  const { data: moduleLessons } = await supabase
+  const { data: moduleLessons } = await dataClient
     .from("lessons")
     .select("id, title, order_index")
     .eq("module_id", lesson.module?.id)

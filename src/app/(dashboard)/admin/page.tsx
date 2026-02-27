@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
 import { Building2, GraduationCap, Users } from "lucide-react";
 import Link from "next/link";
@@ -11,12 +11,15 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminPage() {
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
 
-  const { data: profile } = await supabase
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/learn");
+
+  const { data: profile } = await dataClient
     .from("profiles")
     .select("*")
     .eq("id", user!.id)
@@ -27,15 +30,15 @@ export default async function AdminPage() {
   }
 
   // Get global stats
-  const { count: orgsCount } = await supabase
+  const { count: orgsCount } = await dataClient
     .from("organizations")
     .select("*", { count: "exact", head: true });
 
-  const { count: usersCount } = await supabase
+  const { count: usersCount } = await dataClient
     .from("profiles")
     .select("*", { count: "exact", head: true });
 
-  const { count: coursesCount } = await supabase
+  const { count: coursesCount } = await dataClient
     .from("courses")
     .select("*", { count: "exact", head: true });
 

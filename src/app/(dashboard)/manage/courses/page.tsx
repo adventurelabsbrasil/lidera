@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { BookOpen, Edit, Plus, Trash2 } from "lucide-react";
@@ -13,12 +13,15 @@ export const metadata: Metadata = {
 };
 
 export default async function ManageCoursesPage() {
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
 
-  const { data: profile } = await supabase
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/learn");
+
+  const { data: profile } = await dataClient
     .from("profiles")
     .select("*")
     .eq("id", user!.id)
@@ -29,7 +32,7 @@ export default async function ManageCoursesPage() {
   }
 
   // Get courses for this organization
-  const { data: courses } = await supabase
+  const { data: courses } = await dataClient
     .from("courses")
     .select(`
       *,

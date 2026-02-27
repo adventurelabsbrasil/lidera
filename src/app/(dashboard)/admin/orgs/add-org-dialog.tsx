@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createDataClient } from "@/lib/supabase/client";
 import { Button, Input, Label } from "@/components/ui";
 import { Loader2, Plus, X } from "lucide-react";
 
@@ -20,9 +20,9 @@ export function AddOrgDialog() {
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
+    const dataClient = createDataClient();
 
-    const { error: insertError } = await supabase.from("organizations").insert({
+    const { error: insertError } = await dataClient.from("organizations").insert({
       name,
       slug: slug || name.toLowerCase().replace(/\s+/g, "-"),
       domain: domain || null,

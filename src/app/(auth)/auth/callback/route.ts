@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
@@ -7,13 +7,16 @@ export async function GET(request: Request) {
   const redirect = searchParams.get("redirect") || "/learn";
 
   if (code) {
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    const authClient = await createAuthClient();
+    const { data, error } = await authClient.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      await supabase.rpc("process_pending_invites", {
-        p_user_id: data.user.id,
-      });
+      const dataClient = await createDataClient();
+      if (dataClient) {
+        await dataClient.rpc("process_pending_invites", {
+          p_user_id: data.user.id,
+        });
+      }
       return NextResponse.redirect(`${origin}${redirect}`);
     }
   }

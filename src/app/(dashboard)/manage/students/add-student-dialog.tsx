@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { createDataClient } from "@/lib/supabase/client";
 import { Button, Input, Label } from "@/components/ui";
 import { Loader2, Plus, X } from "lucide-react";
 
@@ -31,7 +31,7 @@ export function AddStudentDialog({ orgId, courses, invitedBy }: AddStudentDialog
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
+    const dataClient = createDataClient();
 
     if (selectedCourses.length === 0) {
       setError("Selecione pelo menos um conteúdo.");
@@ -39,14 +39,14 @@ export function AddStudentDialog({ orgId, courses, invitedBy }: AddStudentDialog
       return;
     }
 
-    // Try to find existing user by email (RPC bypasses RLS for this lookup)
-    const { data: userId } = await supabase.rpc("find_user_id_by_email", {
+    // Try to find existing user by email (RPC on Lidera)
+    const { data: userId } = await dataClient.rpc("find_user_id_by_email", {
       p_email: email.trim(),
     });
 
     if (userId) {
       // User exists: update profile (org_id, full_name) if allowed by RLS, create enrollments
-      await supabase
+      await dataClient
         .from("profiles")
         .update({
           org_id: orgId,
@@ -55,7 +55,7 @@ export function AddStudentDialog({ orgId, courses, invitedBy }: AddStudentDialog
         .eq("id", userId);
 
       for (const courseId of selectedCourses) {
-        await supabase.from("enrollments").upsert(
+        await dataClient.from("enrollments").upsert(
           {
             user_id: userId,
             course_id: courseId,
@@ -66,7 +66,7 @@ export function AddStudentDialog({ orgId, courses, invitedBy }: AddStudentDialog
       }
     } else {
       // User doesn't exist: create pending invite
-      const { error: inviteError } = await supabase
+      const { error: inviteError } = await dataClient
         .from("pending_invites")
         .insert({
           email: email.trim().toLowerCase(),

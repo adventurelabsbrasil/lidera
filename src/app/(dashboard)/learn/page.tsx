@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui";
 import { BookOpen, CheckCircle, Clock, PlayCircle, Trophy } from "lucide-react";
 import Link from "next/link";
@@ -13,39 +13,42 @@ export const metadata: Metadata = {
 };
 
 export default async function LearnPage() {
-  const supabase = await createClient();
-  const user = await getAuthUser(supabase);
+  const authClient = await createAuthClient();
+  const user = await getAuthUser(authClient);
   if (!user) redirect("/auth/login");
 
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/auth/login");
+
   // Get user profile
-  const { data: profile } = await supabase
+  const { data: profile } = await dataClient
     .from("profiles")
     .select("*")
     .eq("id", user.id)
     .single();
 
   // Get enrolled courses count
-  const { count: enrolledCount } = await supabase
+  const { count: enrolledCount } = await dataClient
     .from("enrollments")
     .select("*", { count: "exact", head: true })
     .eq("user_id", user.id)
     .eq("status", "active");
 
   // Get completed lessons count
-  const { count: completedLessons } = await supabase
+  const { count: completedLessons } = await dataClient
     .from("lesson_progress")
     .select("*", { count: "exact", head: true })
     .eq("user_id", user.id)
     .eq("completed", true);
 
   // Get completed tasks count
-  const { count: completedTasks } = await supabase
+  const { count: completedTasks } = await dataClient
     .from("task_completions")
     .select("*", { count: "exact", head: true })
     .eq("user_id", user.id);
 
   // Get total study time (watched_seconds)
-  const { data: progressRows } = await supabase
+  const { data: progressRows } = await dataClient
     .from("lesson_progress")
     .select("watched_seconds")
     .eq("user_id", user.id);
@@ -53,7 +56,7 @@ export default async function LearnPage() {
     progressRows?.reduce((acc, row) => acc + (row.watched_seconds || 0), 0) || 0;
 
   // Get "Continue de onde parou" - first incomplete lesson across enrolled courses
-  const { data: enrollments } = await supabase
+  const { data: enrollments } = await dataClient
     .from("enrollments")
     .select(`
       courses (
@@ -73,7 +76,7 @@ export default async function LearnPage() {
     .eq("user_id", user.id)
     .eq("status", "active");
 
-  const { data: completedProgress } = await supabase
+  const { data: completedProgress } = await dataClient
     .from("lesson_progress")
     .select("lesson_id")
     .eq("user_id", user.id)

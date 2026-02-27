@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui";
 import { Shield, User, Users } from "lucide-react";
 
@@ -10,12 +10,15 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminUsersPage() {
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
 
-  const { data: profile } = await supabase
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/learn");
+
+  const { data: profile } = await dataClient
     .from("profiles")
     .select("*")
     .eq("id", user!.id)
@@ -26,7 +29,7 @@ export default async function AdminUsersPage() {
   }
 
   // Get all users with their organizations
-  const { data: users } = await supabase
+  const { data: users } = await dataClient
     .from("profiles")
     .select(`
       *,

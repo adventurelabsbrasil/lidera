@@ -151,6 +151,17 @@ npx vercel --prod
 Configure as variaveis de ambiente na Vercel:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_LIDERA_SUPABASE_URL`
+- `NEXT_PUBLIC_LIDERA_SUPABASE_ANON_KEY`
+- `LIDERA_SUPABASE_JWT_SECRET` (server only)
+- `LIDERA_SUPABASE_SERVICE_ROLE_KEY` (server only)
+
+### Modo dual Supabase (Adventure Auth + Lidera Database)
+
+Para usar **Auth no projeto Adventure** e **banco de dados no projeto Lidera**, preencha todas as variaveis do `.env.example`:
+
+- **Adventure** (NEXT_PUBLIC_SUPABASE_*): login, sessao, cookies. Configure Site URL e Redirect URLs no dashboard Adventure.
+- **Lidera** (NEXT_PUBLIC_LIDERA_* + LIDERA_*): tabelas, RLS, storage. Rode as migrations e o seed no projeto Lidera. O JWT Secret e o Service Role do Lidera sao usados no server para gerar o token de sessao (ponte) e sincronizar perfis. No projeto Lidera, execute tambem a migration opcional `20260227000001_lidera_dual_allow_external_profiles.sql` para permitir perfis com id de usuários que existem apenas no Auth da Adventure.
 
 ## Comandos
 

@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { CourseForm } from "../course-form";
 import { ModuleManager } from "./module-manager";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
@@ -13,12 +13,10 @@ export async function generateMetadata({
   params,
 }: EditCoursePageProps): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: course } = await supabase
-    .from("courses")
-    .select("title")
-    .eq("id", id)
-    .single();
+  const dataClient = await createDataClient();
+  const { data: course } = dataClient
+    ? await dataClient.from("courses").select("title").eq("id", id).single()
+    : { data: null };
 
   return {
     title: `Editar: ${course?.title || "Conteúdo"}`,
@@ -27,22 +25,26 @@ export async function generateMetadata({
 
 export default async function EditCoursePage({ params }: EditCoursePageProps) {
   const { id } = await params;
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
+  if (!user) redirect("/learn");
 
-  const { data: profile } = await supabase
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/learn");
+
+  const { data: profile } = await dataClient
     .from("profiles")
     .select("*")
-    .eq("id", user!.id)
+    .eq("id", user.id)
     .single();
 
   if (!profile || (profile.role !== "tenant" && profile.role !== "admin")) {
     redirect("/learn");
   }
 
-  const { data: course } = await supabase
+  const { data: course } = await dataClient
     .from("courses")
     .select(`
       *,

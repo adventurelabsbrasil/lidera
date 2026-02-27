@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createDataClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { Loader2, PenLine, Save } from "lucide-react";
@@ -26,9 +26,9 @@ export function LessonNotes({ lessonId, userId, initialContent }: LessonNotesPro
     if (!content.trim()) return;
 
     setSaving(true);
-    const supabase = createClient();
+    const dataClient = createDataClient();
 
-    const { error } = await supabase.from("notes").upsert(
+    const { error } = await dataClient.from("notes").upsert(
       {
         user_id: userId,
         lesson_id: lessonId,

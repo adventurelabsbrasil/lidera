@@ -13,7 +13,7 @@ import {
   Building2,
   LayoutDashboard,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { createAuthClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useViewSwitcher } from "@/lib/context/view-switcher-context";
 import type { UserRole } from "@/types/database";
@@ -94,8 +94,8 @@ export function DashboardNav() {
   );
 
   async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    const authClient = createAuthClient();
+    await authClient.auth.signOut();
     router.push("/auth/login");
     router.refresh();
   }

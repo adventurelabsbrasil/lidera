@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { Clock, Plus, Users } from "lucide-react";
@@ -12,12 +12,15 @@ export const metadata: Metadata = {
 };
 
 export default async function ManageStudentsPage() {
-  const supabase = await createClient();
+  const authClient = await createAuthClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await authClient.auth.getUser();
 
-  const { data: profile } = await supabase
+  const dataClient = await createDataClient();
+  if (!dataClient) redirect("/learn");
+
+  const { data: profile } = await dataClient
     .from("profiles")
     .select("*")
     .eq("id", user!.id)
@@ -28,7 +31,7 @@ export default async function ManageStudentsPage() {
   }
 
   // Get students: users enrolled in our org's courses (includes org members + cross-enrolled)
-  const { data: courseIds } = await supabase
+  const { data: courseIds } = await dataClient
     .from("courses")
     .select("id")
     .eq("org_id", profile.org_id!);
@@ -36,7 +39,7 @@ export default async function ManageStudentsPage() {
 
   const { data: enrollmentsData } =
     ids.length > 0
-      ? await supabase
+      ? await dataClient
           .from("enrollments")
           .select(`
             user_id,
@@ -52,7 +55,7 @@ export default async function ManageStudentsPage() {
   ];
   const { data: students } =
     uniqueUserIds.length > 0
-      ? await supabase
+      ? await dataClient
           .from("profiles")
           .select(`
             id,
@@ -73,13 +76,13 @@ export default async function ManageStudentsPage() {
     enrollmentsByUser[key].push({ status: row.status, courses: courses ?? null });
   }
 
-  const { data: pendingInvites } = await supabase
+  const { data: pendingInvites } = await dataClient
     .from("pending_invites")
     .select("id, email, full_name, course_ids, created_at")
     .eq("org_id", profile.org_id!)
     .order("created_at", { ascending: false });
 
-  const { data: courses } = await supabase
+  const { data: courses } = await dataClient
     .from("courses")
     .select("id, title")
     .eq("org_id", profile.org_id!)

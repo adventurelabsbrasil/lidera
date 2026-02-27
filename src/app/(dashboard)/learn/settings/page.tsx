@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/ui";
 import { getAuthUserWithProfile } from "@/lib/supabase/auth-helpers";
 import { PreferencesForm } from "./preferences-form";
@@ -11,8 +11,9 @@ export const metadata: Metadata = {
 };
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
-  const auth = await getAuthUserWithProfile(supabase);
+  const authClient = await createAuthClient();
+  const dataClient = await createDataClient();
+  const auth = await getAuthUserWithProfile(authClient, dataClient);
   if (!auth) redirect("/auth/login");
   const { user, profile } = auth;
 

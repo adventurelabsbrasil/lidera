@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createDataClient } from "@/lib/supabase/client";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from "@/components/ui";
 import { Loader2, Save } from "lucide-react";
 
@@ -24,8 +24,8 @@ export function PreferencesForm({ userId, initialData }: PreferencesFormProps) {
     setLoading(true);
     setMessage(null);
 
-    const supabase = createClient();
-    const { error } = await supabase
+    const dataClient = createDataClient();
+    const { error } = await dataClient
       .from("profiles")
       .update({
         full_name: fullName,

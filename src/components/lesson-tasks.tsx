@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { createDataClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { CheckSquare, Square } from "lucide-react";
 
@@ -27,12 +27,12 @@ export function LessonTasks({
 
   async function toggleTask(taskId: string) {
     setLoading(taskId);
-    const supabase = createClient();
+    const dataClient = createDataClient();
     const isCompleted = completed.has(taskId);
 
     if (isCompleted) {
       // Remove completion
-      const { error } = await supabase
+      const { error } = await dataClient
         .from("task_completions")
         .delete()
         .eq("user_id", userId)
@@ -47,7 +47,7 @@ export function LessonTasks({
       }
     } else {
       // Add completion
-      const { error } = await supabase.from("task_completions").insert({
+      const { error } = await dataClient.from("task_completions").insert({
         user_id: userId,
         task_id: taskId,
       });
