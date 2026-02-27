@@ -99,6 +99,7 @@ O seed já inclui organizações, 4 conteúdos com módulos/aulas, e **usuários
    - `supabase/migrations/20260211000001_initial_schema.sql`
    - `supabase/migrations/20260211000002_rls_policies.sql`
    - `supabase/migrations/20260212000001_pending_invites.sql`
+   - `supabase/migrations/20260212000002_storage_thumbnails.sql`
 3. Execute o seed: `supabase/seed.sql`
 4. Usuários de teste são criados pelo seed; use os logins acima (em projeto remoto você pode precisar ajustar Auth ou criar usuários manualmente e depois atualizar `profiles`).
 
