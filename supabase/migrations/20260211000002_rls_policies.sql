@@ -17,15 +17,11 @@ ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
 -- ============================================
 -- HELPER FUNCTIONS
 -- ============================================
-
--- Drop existing functions first
-DROP FUNCTION IF EXISTS get_user_role();
-DROP FUNCTION IF EXISTS get_user_org_id();
-DROP FUNCTION IF EXISTS is_admin();
-DROP FUNCTION IF EXISTS is_tenant_or_admin();
+-- Use CREATE OR REPLACE so policies in later migrations (e.g. pending_invites)
+-- that depend on these functions are not broken.
 
 -- Get current user's role
-CREATE FUNCTION get_user_role()
+CREATE OR REPLACE FUNCTION get_user_role()
 RETURNS user_role AS $$
     SELECT role FROM profiles WHERE id = auth.uid();
 $$ LANGUAGE sql SECURITY DEFINER STABLE;

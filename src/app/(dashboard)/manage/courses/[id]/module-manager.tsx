@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { createDataClient } from "@/lib/supabase/client";
-import { Button, Input, Label } from "@/components/ui";
-import { ChevronDown, ChevronRight, Loader2, Plus, Trash2 } from "lucide-react";
+import { Button, Input } from "@/components/ui";
+import { ChevronDown, ChevronRight, FileStack, Loader2, Plus, Trash2 } from "lucide-react";
+import { LessonResourcesManager } from "./lesson-resources-manager";
 
 interface Module {
   id: string;
@@ -28,9 +28,9 @@ interface ModuleManagerProps {
 }
 
 export function ModuleManager({ courseId, modules: initialModules }: ModuleManagerProps) {
-  const router = useRouter();
   const [modules, setModules] = useState(initialModules);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+  const [expandedResourcesLessonId, setExpandedResourcesLessonId] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [newModuleTitle, setNewModuleTitle] = useState("");
   const [addingModule, setAddingModule] = useState(false);
@@ -273,6 +273,25 @@ export function ModuleManager({ courseId, modules: initialModules }: ModuleManag
                             }
                             placeholder="Duracao (minutos)"
                           />
+                          <div className="flex items-center gap-2 pt-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                setExpandedResourcesLessonId((prev) =>
+                                  prev === lesson.id ? null : lesson.id
+                                )
+                              }
+                            >
+                              <FileStack className="h-4 w-4 mr-1" />
+                              Recursos (planilhas, docs, links)
+                            </Button>
+                          </div>
+                          {expandedResourcesLessonId === lesson.id && (
+                            <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                              <LessonResourcesManager lessonId={lesson.id} />
+                            </div>
+                          )}
                         </div>
                         <Button
                           variant="ghost"

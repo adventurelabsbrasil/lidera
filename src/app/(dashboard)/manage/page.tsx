@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createAuthClient, createDataClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, PageHeader } from "@/components/ui";
-import { BookOpen, GraduationCap, Users } from "lucide-react";
+import { Activity, BookOpen, GraduationCap, Users } from "lucide-react";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -119,6 +119,20 @@ export default async function ManagePage() {
               </CardTitle>
               <CardDescription>
                 Adicionar alunos e gerenciar matriculas
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link href="/manage/access">
+          <Card className="cursor-pointer transition-shadow hover:shadow-md">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-amber-600" />
+                Acesso dos Alunos
+              </CardTitle>
+              <CardDescription>
+                Ver quem acessou os conteudos e quantas aulas foram concluidas
               </CardDescription>
             </CardHeader>
           </Card>

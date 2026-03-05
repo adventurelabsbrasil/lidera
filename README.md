@@ -163,6 +163,8 @@ Para usar **Auth no projeto Adventure** e **banco de dados no projeto Lidera**, 
 - **Adventure** (NEXT_PUBLIC_SUPABASE_*): login, sessao, cookies. Configure Site URL e Redirect URLs no dashboard Adventure.
 - **Lidera** (NEXT_PUBLIC_LIDERA_* + LIDERA_*): tabelas, RLS, storage. Rode as migrations e o seed no projeto Lidera. O JWT Secret e o Service Role do Lidera sao usados no server para gerar o token de sessao (ponte) e sincronizar perfis. No projeto Lidera, execute tambem a migration opcional `20260227000001_lidera_dual_allow_external_profiles.sql` para permitir perfis com id de usuários que existem apenas no Auth da Adventure.
 
+**Checklist completo para retomar e acessar o app:** [docs/retomar-auth-db.md](docs/retomar-auth-db.md).
+
 ## Comandos
 
 ```bash
@@ -171,6 +173,7 @@ npm run build      # Build de producao
 npm run lint       # Verificar lint
 npm run typecheck  # Verificar tipos
 npm run validate   # Lint + Types + Build
+npm run db:types   # Gerar tipos TS do schema do Supabase Lidera (requer supabase login)
 ```
 
 ## Estrutura de Pastas

@@ -42,11 +42,15 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
 
+    const appOrigin =
+      typeof process.env.NEXT_PUBLIC_APP_URL !== "undefined" && process.env.NEXT_PUBLIC_APP_URL
+        ? new URL(process.env.NEXT_PUBLIC_APP_URL).origin
+        : window.location.origin;
     const authClient = createAuthClient();
     const { error } = await authClient.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirect=${redirect}`,
+        redirectTo: `${appOrigin}/auth/callback?redirect=${encodeURIComponent(redirect)}`,
       },
     });
 

@@ -4,7 +4,12 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const redirect = searchParams.get("redirect") || "/learn";
+  const redirectPath = searchParams.get("redirect") || "/learn";
+
+  const appOrigin =
+    process.env.NEXT_PUBLIC_APP_URL?.trim()
+      ? new URL(process.env.NEXT_PUBLIC_APP_URL).origin
+      : origin;
 
   if (code) {
     const authClient = await createAuthClient();
@@ -17,9 +22,9 @@ export async function GET(request: Request) {
           p_user_id: data.user.id,
         });
       }
-      return NextResponse.redirect(`${origin}${redirect}`);
+      return NextResponse.redirect(`${appOrigin}${redirectPath.startsWith("/") ? redirectPath : `/${redirectPath}`}`);
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=auth_error`);
+  return NextResponse.redirect(`${appOrigin}/auth/login?error=auth_error`);
 }

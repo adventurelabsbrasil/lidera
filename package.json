@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "typecheck": "tsc --noEmit",
     "validate": "npm run lint && npm run typecheck && npm run build",
-    "db:types": "supabase gen types typescript --project-id ftctmseyrqhckutpfdeq > src/types/database.ts"
+    "db:types": "supabase gen types typescript --project-id wswtafmzzrfzamcpqvxf > src/types/database.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

@@ -16,6 +16,7 @@ ON CONFLICT (id) DO UPDATE SET
   allowed_mime_types = EXCLUDED.allowed_mime_types;
 
 -- Allow tenant/admin to upload to course-thumbnails
+DROP POLICY IF EXISTS "Tenants and admins can upload thumbnails" ON storage.objects;
 CREATE POLICY "Tenants and admins can upload thumbnails"
 ON storage.objects
 FOR INSERT
@@ -26,6 +27,7 @@ WITH CHECK (
 );
 
 -- Allow tenant/admin to update their uploads
+DROP POLICY IF EXISTS "Tenants and admins can update thumbnails" ON storage.objects;
 CREATE POLICY "Tenants and admins can update thumbnails"
 ON storage.objects
 FOR UPDATE
@@ -36,6 +38,7 @@ USING (
 );
 
 -- Allow tenant/admin to delete thumbnails
+DROP POLICY IF EXISTS "Tenants and admins can delete thumbnails" ON storage.objects;
 CREATE POLICY "Tenants and admins can delete thumbnails"
 ON storage.objects
 FOR DELETE
